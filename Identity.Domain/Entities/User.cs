@@ -13,10 +13,18 @@ namespace Identity.Domain.Entities
         public DateTime? DeleteTime { get; private set; }//软删除时间
         public bool isDelete { get;private set; }//是否软删除
 
-        public User(string userName) : base(userName)
+        public User() { }
+
+        public User(string? userName = null,string? phoneNumber = null)
         {
+            base.UserName = userName;
             this.Id = Guid.NewGuid();
             this.CreateOnTime = DateTime.Now;
+            if(this.UserName == null && phoneNumber != null)//无用户名，手机登录则将用户名设为手机号，密码随机
+            {
+                this.PhoneNumber = phoneNumber;
+                this.UserName = phoneNumber;
+            }
         }
 
         //软删除

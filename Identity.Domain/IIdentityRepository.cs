@@ -12,12 +12,12 @@ namespace Identity.Domain
     {
         Task<User?> FindOneUserByIdAsync(string id);//根据id查找一个用户
         Task<User?> FindOneUserByNameAsync(string name);//根据用户名查找一个用户
-        Task<IEnumerable<User?>> FindUsersByNameAysnc(string name);//查找所有该用户名的用户
+        Task<IEnumerable<User?>> FindUsersByName(string name);//查找所有该用户名的用户
         Task<User?> FindOneByPhoneAsync(string phone);//根据手机号查找用户
         Task<List<string>> GetUserRoleAsync(User user);//获取角色
 
         Task<IdentityResult> CreateUserAsync(string name,string password);//创建用户，通过用户名、密码
-        Task<IdentityResult> CreateUserAsync(string phoneNumber);//创建用户，通过手机号
+        Task<IdentityResult> CreateUserByPhoneAsync(string phoneNumber);//创建用户，通过手机号
         Task<IdentityResult> CreateRoleAsync(string roleName);//创建角色
 
         /// <summary>
@@ -33,9 +33,9 @@ namespace Identity.Domain
         /// <param name="newPhone">新手机号</param>
         /// <param name="token">重置令牌</param>
         /// <returns></returns>
-        Task<SignInResult> ChangePhoneNumAsync(string userId,string newPhone,string token);
+        Task<IdentityResult> ChangePhoneNumAsync(string userId,string newPhone,string token);
 
-        Task<IdentityResult> ChangePwdAsync(Guid userId,string newPwd);//更改用户密码
+        Task<IdentityResult> ChangePwdAsync(Guid userId,string currentPwd,string newPwd);//更改用户密码
 
         /// <summary>
         /// 添加角色到用户中
@@ -51,6 +51,9 @@ namespace Identity.Domain
         /// <param name="userId"></param>
         /// <returns></returns>
         Task<IdentityResult> RemoveUserAsync(Guid userId);
+
+        Task<SignInResult> CheckPasswordAsync(string name, string pwd);//检查用户名和密码是否匹配
+
 
     }
 }
