@@ -33,7 +33,7 @@ namespace Identity.Domain
         /// <param name="newPhone">新手机号</param>
         /// <param name="token">重置令牌</param>
         /// <returns></returns>
-        Task<IdentityResult> ChangePhoneNumAsync(string userId,string newPhone,string token);
+        Task<IdentityResult> ChangePhoneNumAsync(User user,string newPhone,string token);
 
         Task<IdentityResult> ChangePwdAsync(Guid userId,string currentPwd,string newPwd);//更改用户密码
 
@@ -43,7 +43,7 @@ namespace Identity.Domain
         /// <param name="user"></param>
         /// <param name="role"></param>
         /// <returns></returns>
-        Task<IdentityResult> AddRoleToUserAsync(User user,Role role);
+        Task<IdentityResult> AddRoleToUserAsync(User user,string role);
 
         /// <summary>
         /// 删除用户(软删除)

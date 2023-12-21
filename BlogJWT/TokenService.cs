@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BlogJWT
 {
-    internal class TokenService : ITokenService
+    public class TokenService : ITokenService
     {
         public string BuildToken(List<Claim> claims, JWTOptions jwtOpt)
         {

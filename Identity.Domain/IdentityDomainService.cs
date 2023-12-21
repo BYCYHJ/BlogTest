@@ -23,11 +23,13 @@ namespace Identity.Domain
 
         public IdentityDomainService(IIdentityRepository identityRepository,
             ITokenService tokenService,
-            IOptions<JWTOptions> jwtOptions)
+            IOptions<JWTOptions> jwtOptions,
+            IRedisService redisCache)
         {
             _identityRepository = identityRepository;
             _tokenService = tokenService;
             _jwtOpt = jwtOptions;
+            _redisCache = redisCache;
         }
 
         /// <summary>
@@ -57,15 +59,11 @@ namespace Identity.Domain
         /// </summary>
         /// <param name="phone"></param>
         /// <returns></returns>
-        public async Task<(SignInResult,string? code)> CreatePhoneTokenCode(string phone)
+        public async Task<(SignInResult,string? code)> CreatePhoneTokenCodeAsync(string phone)
         {
             string code =  new Random().Next(100000,999999).ToString();
             string key = $"Identity_Phone_{phone}";
-            var result = await _redisCache.SetAsync(key,code,60);
-            if (!result)//未成功保存
-            {
-                return (SignInResult.Failed,null);
-            }
+            await _redisCache.SetAsync(key,code,60);//保存至数据库,过期时间为60s
             return (SignInResult.Success,code);
         }
 
@@ -76,7 +74,7 @@ namespace Identity.Domain
         /// <param name="phone"></param>
         /// <param name="tokenCode"></param>
         /// <returns></returns>
-        public async Task<SignInResult> CheckPhoneAndToken(string phone, string tokenCode)
+        public async Task<SignInResult> CheckPhoneAndTokenAsync(string phone, string tokenCode)
         {
             string key = $"Identity_Phone_{phone}";
             var cacheCode = await _redisCache.GetAsync(key);

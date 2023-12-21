@@ -32,9 +32,9 @@ namespace IdentityService.Infrastructure
         /// <param name="user"></param>
         /// <param name="role"></param>
         /// <returns></returns>
-        public async Task<IdentityResult> AddRoleToUserAsync(User user, Role role)
+        public async Task<IdentityResult> AddRoleToUserAsync(User user, string role)
         {
-            var result = await _userManager.AddToRoleAsync(user,role.Name);
+            var result = await _userManager.AddToRoleAsync(user,role);
             return result;
         }
         
@@ -45,13 +45,8 @@ namespace IdentityService.Infrastructure
         /// <param name="newPhone"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async Task<IdentityResult> ChangePhoneNumAsync(string userId, string newPhone, string token)
+        public async Task<IdentityResult> ChangePhoneNumAsync(User user, string newPhone, string token)
         {
-            User? user = await FindOneUserByIdAsync(userId);
-            if(user is null)
-            {
-                return ErrorResult($"not found user with id:{userId}");
-            }
             var result = await _userManager.ChangePhoneNumberAsync(user,newPhone,token);
             return result;
         }

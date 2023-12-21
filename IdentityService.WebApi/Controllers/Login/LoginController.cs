@@ -1,5 +1,5 @@
-﻿using Identity.Domain;
-using Identity.Domain.Entities;
+﻿using Identity.Domain.Entities;
+using Identity.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Security.Claims;
 
-namespace IdentityServiceWebApi.Controllers.Login
+namespace IdentityService.WebApi.Controllers.Login
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
@@ -17,7 +17,8 @@ namespace IdentityServiceWebApi.Controllers.Login
         private readonly IIdentityRepository idRepository;
         private readonly ISendMail mailSender;
 
-        public LoginController(IdentityDomainService idService,IIdentityRepository idRespository,ISendMail mailSender) {
+        public LoginController(IdentityDomainService idService, IIdentityRepository idRespository, ISendMail mailSender)
+        {
             this.idService = idService;
             this.idRepository = idRespository;
             this.mailSender = mailSender;
@@ -28,16 +29,17 @@ namespace IdentityServiceWebApi.Controllers.Login
         [HttpPost]
         public async Task<ActionResult<string?>> LoginWithNameAndPwd(UserResponse loginInfo)
         {
-            var result = await idService.CheckUserAndPasswordAsync(loginInfo.userName,loginInfo.password);
+            var result = await idService.CheckUserAndPasswordAsync(loginInfo.userName, loginInfo.password);
             if (!result.checkResult.Succeeded)
             {
                 string msg = "用户名或密码不正确";
-                return StatusCode((int)HttpStatusCode.BadRequest,msg);
-            }else if (result.checkResult.IsLockedOut)
-            {
-                return StatusCode((int)HttpStatusCode.Locked,"此账号已被锁定");
+                return StatusCode((int)HttpStatusCode.BadRequest, msg);
             }
-            return StatusCode((int)HttpStatusCode.OK,result.token);
+            else if (result.checkResult.IsLockedOut)
+            {
+                return StatusCode((int)HttpStatusCode.Locked, "此账号已被锁定");
+            }
+            return StatusCode((int)HttpStatusCode.OK, result.token);
         }
 
         //获取验证码
@@ -46,9 +48,9 @@ namespace IdentityServiceWebApi.Controllers.Login
         public async Task<ActionResult<String?>> GetPhoneTokenCode(string phone)
         {
             var user = await idRepository.FindOneByPhoneAsync(phone);
-            if(user is null)
+            if (user is null)
             {
-                return StatusCode((int)HttpStatusCode.Unauthorized,"没有该账户");
+                return StatusCode((int)HttpStatusCode.Unauthorized, "没有该账户");
             }
             var createResult = await idService.CreatePhoneTokenCodeAsync(phone);
             if (!createResult.Item1.Succeeded)
@@ -56,20 +58,20 @@ namespace IdentityServiceWebApi.Controllers.Login
                 return StatusCode((int)HttpStatusCode.BadGateway, "未成功创建验证码请重新发送");
             }
             //开始发送验证码
-            await mailSender.SendSmsMail(phone,new string[] {"code",createResult.code!});
+            await mailSender.SendSmsMail(phone, new string[] { "code", createResult.code! });
             return StatusCode((int)HttpStatusCode.OK, createResult.code);
         }
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<ActionResult<string?>> LoginWithPhone(string phone,string code)
+        public async Task<ActionResult<string?>> LoginWithPhone(string phone, string code)
         {
-            var result = await idService.CheckPhoneAndTokenAsync(phone,code);
-            if(result.Succeeded)
+            var result = await idService.CheckPhoneAndTokenAsync(phone, code);
+            if (result.Succeeded)
             {
                 User user = (await idRepository.FindOneByPhoneAsync(phone))!;
                 var token = await idService.GetTokenAsync(user);
-                return StatusCode((int)HttpStatusCode.OK,token);
+                return StatusCode((int)HttpStatusCode.OK, token);
             }
             return StatusCode((int)HttpStatusCode.BadGateway, "验证码不正确");
         }
@@ -85,12 +87,12 @@ namespace IdentityServiceWebApi.Controllers.Login
             {
                 return NotFound();
             }
-            else return new { userName = user.UserName, phoneNumber= user.PhoneNumber};
+            else return new { userName = user.UserName, phoneNumber = user.PhoneNumber };
         }
 
         [Authorize]
         [HttpPatch]
-        public async Task<ActionResult> ChangePassword(string currentPwd,string newPwd)
+        public async Task<ActionResult> ChangePassword(string currentPwd, string newPwd)
         {
             var userId = Guid.Parse(this.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var result = await idRepository.ChangePwdAsync(userId, currentPwd, newPwd);
@@ -108,8 +110,9 @@ namespace IdentityServiceWebApi.Controllers.Login
         {
             string username = "AnAn";
             string password = "15550239";
-            var result = await idRepository.CreateUserAsync(username,password);
-            if (!result.Succeeded) {
+            var result = await idRepository.CreateUserAsync(username, password);
+            if (!result.Succeeded)
+            {
                 return BadRequest(result.Errors.SumErrors());
             }
             var role1 = "admin";
@@ -121,7 +124,8 @@ namespace IdentityServiceWebApi.Controllers.Login
                 var user = await idRepository.FindOneUserByNameAsync(username);
                 await idRepository.AddRoleToUserAsync(user, role1);
                 return Ok();
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
             }

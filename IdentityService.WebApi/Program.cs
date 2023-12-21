@@ -18,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<IdServiceDbContext>(opt =>
 {
     var conStr = builder.Configuration.GetSection("MySqlConStr").Value!;
-    opt.UseMySql(conStr,ServerVersion.Parse("8.0.34-mysql"));
+    opt.UseMySql(conStr, ServerVersion.Parse("8.0.34-mysql"));
 });
 
 //redis
@@ -48,18 +48,18 @@ else
     {
         var scheme = new OpenApiSecurityScheme()
         {
-            Description="Authorization",
+            Description = "Authorization",
             Reference = new OpenApiReference()
             {
                 Type = ReferenceType.SecurityScheme,
                 Id = "Authorization"
             },
-            Scheme="oauth2",
-            Name="Authorization",
+            Scheme = "oauth2",
+            Name = "Authorization",
             In = ParameterLocation.Header,
             Type = SecuritySchemeType.ApiKey,
         };
-        options.AddSecurityDefinition("Authorization",scheme);
+        options.AddSecurityDefinition("Authorization", scheme);
         var requirement = new OpenApiSecurityRequirement();
         requirement[scheme] = new List<string>();
         options.AddSecurityRequirement(requirement);
