@@ -78,24 +78,23 @@ namespace BlogRabbitHelper
             var consumeChannel = _connection.CreateModel();//不使用using销毁
             consumeChannel.ExchangeDeclare(
                 exchange: _exchangeName,
-                type: exchangerType,
-                durable: true
+                type: exchangerType
                 );
             consumeChannel.QueueDeclare(
                 queue: _queueName,
                 durable: true,
-                exclusive: true,
+                exclusive: false,///是否排他, true排他的, 如果一个队列声明为排他队列, 该队列仅对首次声明它的连接可见, 并在连接断开时自动删除
                 autoDelete: false
                 );
             consumeChannel.QueueBind(_queueName, _exchangeName, eventName);
 
-            _subscriptionManager.AddSubscription(eventName, handlerType);
+            _subscriptionManager.AddSubscription(eventName, handlerType);//将订阅者加入集合
 
             var consumer = new AsyncEventingBasicConsumer(consumeChannel);
             consumer.Received += async (sender, eventArgs) =>
             {
                 var enventName = eventArgs.RoutingKey;
-                var data = Encoding.UTF8.GetString(eventArgs.Body.Span);
+                var data = Encoding.UTF8.GetString(eventArgs.Body.Span);//将生产者发送的byte[] msg转为json格式的字符串
                 await ProcessEvent(enventName,data);
                 consumeChannel.BasicAck(eventArgs.DeliveryTag,false);
             };
