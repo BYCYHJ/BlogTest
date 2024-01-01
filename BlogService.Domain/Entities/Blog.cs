@@ -47,17 +47,6 @@ namespace BlogService.Domain.Entities
             StartCount++;
         }
 
-        //取消点赞
-        public void SubStar()
-        {
-            StartCount--;
-        }
-
-        public void AddStars()
-        {
-            this.StarCount++;
-        }
-
         public void RemoveStars()
         {
             this.RemoveStars();
