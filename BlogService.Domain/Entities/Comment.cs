@@ -25,7 +25,6 @@ namespace BlogService.Domain.Entities
             UserId = userId;
             IsReplyComment = isReplyComment;
             ReplyCommentId = replyCommentId;
-
         }
 
     }
