@@ -52,5 +52,15 @@ namespace BlogService.Domain.Entities
         {
             StartCount--;
         }
+
+        public void AddStars()
+        {
+            this.StarCount++;
+        }
+
+        public void RemoveStars()
+        {
+            this.RemoveStars();
+        }
     }
 }

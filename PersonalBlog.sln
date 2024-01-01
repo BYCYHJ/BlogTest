@@ -22,8 +22,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BlogService", "BlogService", "{F26D61C3-2179-4117-8DB8-D3907619CFA3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlogService.Domain", "BlogService.Domain\BlogService.Domain.csproj", "{963CEAD4-DFEE-470C-843E-257CEC1AB8D0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0A382DD0-F02D-4C9C-803E-B7E0731EC815} = {0A382DD0-F02D-4C9C-803E-B7E0731EC815}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlogRabbitHelper", "BlogRabbitHelper\BlogRabbitHelper.csproj", "{16A7E792-7435-4337-A65D-67EA32E2746C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlogRabbitHelper", "BlogRabbitHelper\BlogRabbitHelper.csproj", "{16A7E792-7435-4337-A65D-67EA32E2746C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

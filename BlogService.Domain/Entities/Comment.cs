@@ -18,6 +18,8 @@ namespace BlogService.Domain.Entities
         public bool IsReplyComment { get; init; }//是否为回复评论的评论,0=n,1=y
         public string? ReplyCommentId { get; init; }//所属的评论的id
 
+        private Comment() { }
+
         public Comment(string content, string blogId, string userId, bool isReplyComment = false, string? replyCommentId = null)
         {
             Content = content;

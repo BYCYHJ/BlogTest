@@ -9,8 +9,9 @@ namespace BlogService.Domain
 {
     public interface IBlogRepository
     {
-        Task AddBlogAsync(Blog blog);
-        Task UpdateBlogAsync(Blog blog);
-        Task DeleteBlogAsync(Guid blogId);
+        Task<Blog> FindOneById(string id);
+        Task CreateBlog(Blog blog);
+        Task UpdateBlog(Blog blog);
+        Task Task<Blog>(string id);
     }
 }

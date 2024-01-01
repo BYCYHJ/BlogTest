@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlogService.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +9,8 @@ namespace BlogService.Domain
 {
     public interface ICommentRepository
     {
-        Task AddBlogComment(Guid blogId,string content);
-        Task AddReplyComment(Guid commentId,string content);
-        Task DeleteComment(Guid commentId);
+        Task<IEnumerable<Comment>> GetCommentsWithBlogId(string blogId);
+        Task CreateComment(Comment comment);
+        Task DeleteComment(string commentId);
     }
 }
