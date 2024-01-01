@@ -94,8 +94,10 @@ namespace Identity.Domain
         public async Task<string> GetTokenAsync(User user)
         {
             var roles = await _identityRepository.GetUserRoleAsync(user);//用户角色
+            //包含了用户id、姓名和角色
             var claims = new List<Claim>();
             claims.Add(new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.Name,user.UserName!));
             foreach(var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role,role));
