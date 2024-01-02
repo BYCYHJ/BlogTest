@@ -23,6 +23,29 @@ namespace BlogService.Domain
         }
 
         /// <summary>
+        /// 创建博客,若没有传userId则根据token解析
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="content"></param>
+        /// <param name="tags"></param>
+        /// <param name="token"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task CreateBlog(string title,string content,List<TagClass>? tags, string token,string? userId = null)
+        {
+            Guid userid;
+            if (userId != null)
+            {
+                userid = Guid.Parse(userId);
+            }
+            else {
+                userid = GetCurrentUserId(token);
+            }
+            Blog blog = new Blog(title,content,userid,tags);
+            await blogRepository.CreateBlog(blog);
+        }
+
+        /// <summary>
         /// 根据id查找博客，返回博客以及包含的评论
         /// </summary>
         /// <param name="id"></param>

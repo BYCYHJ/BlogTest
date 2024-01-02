@@ -28,6 +28,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlogService.Domain", "BlogS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlogRabbitHelper", "BlogRabbitHelper\BlogRabbitHelper.csproj", "{16A7E792-7435-4337-A65D-67EA32E2746C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlogService.Infrastructure", "BlogService.Infrastructure\BlogService.Infrastructure.csproj", "{37E41063-9BBE-4BD7-801B-4589988F0CB2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{963CEAD4-DFEE-470C-843E-257CEC1AB8D0} = {963CEAD4-DFEE-470C-843E-257CEC1AB8D0}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,6 +71,10 @@ Global
 		{16A7E792-7435-4337-A65D-67EA32E2746C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16A7E792-7435-4337-A65D-67EA32E2746C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16A7E792-7435-4337-A65D-67EA32E2746C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37E41063-9BBE-4BD7-801B-4589988F0CB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37E41063-9BBE-4BD7-801B-4589988F0CB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37E41063-9BBE-4BD7-801B-4589988F0CB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37E41063-9BBE-4BD7-801B-4589988F0CB2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -79,6 +88,7 @@ Global
 		{16005872-41E9-40E5-94AE-D30C45ECCE98} = {A92579F0-71B0-421E-8E45-BD66ADE07FF4}
 		{963CEAD4-DFEE-470C-843E-257CEC1AB8D0} = {F26D61C3-2179-4117-8DB8-D3907619CFA3}
 		{16A7E792-7435-4337-A65D-67EA32E2746C} = {AB6B5356-615C-4BE5-AC1B-D5B53DF3B408}
+		{37E41063-9BBE-4BD7-801B-4589988F0CB2} = {F26D61C3-2179-4117-8DB8-D3907619CFA3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6610167F-806F-43F4-B55C-397BA2C60557}

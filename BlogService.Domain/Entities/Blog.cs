@@ -7,10 +7,10 @@ namespace BlogService.Domain.Entities
         public string Title { get; private set; }//博客标题
         public string Content { get; private set; }//文章内容
         public List<TagClass> Tags { get; private set; } = new List<TagClass>();//文章标签
-        public string UserId { get; init; }//作者
+        public Guid UserId { get; init; }//作者
         public int StartCount { get; private set; } = 0;//点赞数
 
-        public Blog(string title, string content, string userId,List<TagClass>? tags = null)
+        public Blog(string title, string content, Guid userId,List<TagClass>? tags = null)
         {
             Title = title;
             Content = content;
