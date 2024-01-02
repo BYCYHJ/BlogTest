@@ -42,7 +42,7 @@ namespace BlogService.Domain
                 userid = GetCurrentUserId(token);
             }
             Blog blog = new Blog(title,content,userid,tags);
-            await blogRepository.CreateBlog(blog);
+            await blogRepository.CreateBlogAsync(blog);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace BlogService.Domain
         /// <exception cref="Exception"></exception>
         public async Task<(Blog targetBlog,List<Comment> comments)> GetTargetBlogById(string id)
         {
-            Blog? targetBlog = await blogRepository.FindOneById(id);
+            Blog? targetBlog = await blogRepository.FindOneByIdAsync(id);
             if (targetBlog == null)
             {
                 throw new Exception($"找不到id为{id}的博客");

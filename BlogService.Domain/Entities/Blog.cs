@@ -6,9 +6,14 @@ namespace BlogService.Domain.Entities
     {
         public string Title { get; private set; }//博客标题
         public string Content { get; private set; }//文章内容
-        public List<TagClass> Tags { get; private set; } = new List<TagClass>();//文章标签
+        public List<TagClass> Tags { get; set; } = new List<TagClass>();//文章标签
         public Guid UserId { get; init; }//作者
         public int StartCount { get; private set; } = 0;//点赞数
+        public List<Comment> Comments { get; set; } = new List<Comment>();//评论
+
+        private Blog()
+        {
+        }
 
         public Blog(string title, string content, Guid userId,List<TagClass>? tags = null)
         {
@@ -18,6 +23,10 @@ namespace BlogService.Domain.Entities
             if(tags is not null && tags.Any())
             {
                 this.Tags.AddRange(tags);
+            }
+            else
+            {
+                this.Tags.Add(TagClass.All);//为空则自动设置为All标签
             }
         }
 
@@ -49,7 +58,11 @@ namespace BlogService.Domain.Entities
 
         public void RemoveStars()
         {
-            this.RemoveStars();
+            if(this.Tags.Count > 0)
+            {
+                StartCount--;
+            }
+            StartCount = 0;
         }
     }
 }
