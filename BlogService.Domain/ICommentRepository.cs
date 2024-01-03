@@ -9,8 +9,10 @@ namespace BlogService.Domain
 {
     public interface ICommentRepository
     {
-        Task<IEnumerable<Comment>> GetCommentsWithBlogId(string blogId);
-        Task CreateComment(Comment comment);
-        Task DeleteComment(string commentId);
+        Task<IEnumerable<Comment>> GetCommentsWithBlogIdAsync(string blogId);
+        Task<IEnumerable<Comment>> GetCommentsWithCommentIdAsync(string commentId);
+        Task<Comment?> FindOneByIdAsync(string commentId);
+        Task CreateCommentAsync(Comment comment);
+        Task DeleteCommentAsync(string commentId);
     }
 }
