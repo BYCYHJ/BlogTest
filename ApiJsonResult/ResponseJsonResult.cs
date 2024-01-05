@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +17,11 @@ namespace ApiJsonResult
         private string? msg;
         public string? Message { get 
             {
-                return msg;
+                return msg == null ? EnumHelper.GetDescription(StatusCode) : msg;
             }
             set
             {
-                msg = value == null || value == String.Empty ? EnumHelper.GetDescription(StatusCode) : value;
+                msg = value;
             } 
         }
         public T? Data { get; set; }
@@ -30,7 +33,7 @@ namespace ApiJsonResult
         }
 
         /// <summary>
-        /// 隐式转换
+        /// 隐式转换 T => ResponseJsonResult
         /// </summary>
         /// <param name="data"></param>
         public static implicit operator ResponseJsonResult<T>(T data)
@@ -38,9 +41,11 @@ namespace ApiJsonResult
             return new ResponseJsonResult<T>(data);
         }
 
-        public Task ExecuteResultAsync(ActionContext context)
+        public async Task ExecuteResultAsync(ActionContext context)
         {
-            throw new NotImplementedException();
+            var services = context.HttpContext.RequestServices;
+            var executor = services.GetRequiredService<IActionResultExecutor<ResponseJsonResult<T>>>();
+            await executor.ExecuteAsync(context, this);
         }
     }
 }

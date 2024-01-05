@@ -73,5 +73,23 @@ namespace ApiJsonResult
                 Message = msg
             };
         }
+
+        /// <summary>
+        /// 自定义状态
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="status"></param>
+        /// <param name="data"></param>
+        /// <param name="msg"></param>
+        /// <returns></returns>
+        protected ResponseJsonResult<T> Result<T>(MyStatusCode status,T? data,string? msg = null)
+        {
+            return new ResponseJsonResult<T>
+            {
+                StatusCode = status,
+                Data = data,
+                Message = msg
+            };
+        }
     }
 }
