@@ -15,10 +15,12 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.0-beta.2" />
+    <PackageReference Include="Zack.Commons" Version="1.1.11" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\BlogService.Domain\BlogService.Domain.csproj" />
+    <ProjectReference Include="..\CommenHelper\CommenHelper.csproj" />
   </ItemGroup>
 
 </Project>

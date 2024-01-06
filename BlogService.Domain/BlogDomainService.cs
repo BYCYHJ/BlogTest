@@ -59,7 +59,7 @@ namespace BlogService.Domain
                 throw new Exception($"找不到id为{id}的博客");
             }
             var comments = new List<Comment>();
-            var blogComments = await commentRepository.GetCommentsWithBlogId(id);
+            var blogComments = await commentRepository.GetCommentsWithBlogIdAsync(id);
             if(blogComments != null && blogComments.Any())
             {
                 comments = blogComments.ToList();
