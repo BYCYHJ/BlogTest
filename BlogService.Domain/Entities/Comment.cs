@@ -11,13 +11,13 @@ namespace BlogService.Domain.Entities
 {
     public class Comment : BaseEntity
     {
-        public required string Content { get; init; }//评论内容
-        public required Guid UserId { get; init; }//发表评论的用户Id
+        public string Content { get; private set; }//评论内容
+        public Guid UserId { get; private set; }//发表评论的用户Id
         public int StarCount { get; private set; } = 0;//点赞数
-        public required Guid BlogId { get; init; }//所属博客的id
+        public Guid BlogId { get; private set; }//所属博客的id
         public Blog? Blog { get; private set; }//所属博客(引用属性)
         public List<Comment>? ChildrenComments { get;set; }//评论所包含的评论
-        public Guid? ParentId { get; init; }//所属的评论id
+        public Guid? ParentId { get; private set; }//所属的评论id
         public Comment? ParentComment { get; private set; }//所属的评论(引用属性)
 
         private Comment() { }
@@ -26,7 +26,7 @@ namespace BlogService.Domain.Entities
         {
             this.Content = content;
             this.UserId = Guid.Parse(userId);
-            this.UserId = Guid.Parse(blogId);
+            this.BlogId = Guid.Parse(blogId);
             this.ParentId = parentId is null ? null : Guid.Parse(parentId);
         }
 

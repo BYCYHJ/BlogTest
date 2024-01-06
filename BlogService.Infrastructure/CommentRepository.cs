@@ -1,9 +1,13 @@
-﻿using BlogService.Domain;
+﻿using ApiJsonResult;
+using BlogService.Domain;
 using BlogService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,10 +32,10 @@ namespace BlogService.Infrastructure
         /// <param name="commentId"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public async Task DeleteCommentAsync(string commentId)
+        public async Task<ResponseJsonResult<Comment>> DeleteCommentAsync(string commentId)
         {
             //找到该评论下的所有评论进行删除
-            var comments = await this.GetCommentsWithCommentIdAsync(commentId);
+            var comments = await GetChildrenCommentsAsync(commentId);
             if (comments.Any())
             {
                 _dbContext.RemoveRange(comments);
@@ -39,43 +43,77 @@ namespace BlogService.Infrastructure
             Comment? targetComment = await this.FindOneByIdAsync(commentId);
             if(targetComment is null)
             {
-                throw new Exception($"无法进行删除,原因是找不到id为{commentId}的评论");
+                return ErrorResult($"无法进行删除,原因是找不到id为{commentId}的评论");
             }
             _dbContext.Remove(targetComment);
+            return ResponseJsonResult<Comment>.Succeeded;
         }
 
-        /// <summary>
-        /// 根据id查找指定的comment
-        /// </summary>
-        /// <param name="commentId"></param>
-        /// <returns></returns>
+        //根据id查找指定评论
         public async Task<Comment?> FindOneByIdAsync(string commentId)
         {
-            return await _dbContext.Comments.FirstOrDefaultAsync(c => c.Id.ToString() == commentId);
+            return await _dbContext.Comments.Where(c => c.Id.ToString() == commentId).FirstOrDefaultAsync();
         }
 
-        /// <summary>
-        /// 查找该博客下的所有评论
-        /// </summary>
-        /// <param name="blogId"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<Comment>> GetCommentsWithBlogIdAsync(string blogId)
+        //获取博客下的所有评论，不分页
+        public async Task<IEnumerable<Comment>> GetBlogCommentsAsync(string blogId)
         {
             Guid blogGuid = Guid.Parse(blogId);
-            var comments = await _dbContext.Comments.Where(c => c.BlogId == blogGuid).ToListAsync();
-            return comments;
+            return await _dbContext.Comments.Where(c => c.BlogId == blogGuid).ToListAsync();
         }
 
         /// <summary>
-        /// 查找该评论下的所有评论
+        /// 分页查询：查找该博客下的所有一级评论
         /// </summary>
-        /// <param name="commentId"></param>
+        /// <param name="blogId"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="index"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Comment>> GetCommentsWithCommentIdAsync(string commentId)
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<IEnumerable<Comment>> GetBlogCommentsWithPagesAsync(string blogId, int pageSize, int index)
         {
-            Guid guid = Guid.Parse(commentId);
-            var comments = await _dbContext.Comments.Where(c => c.ParentId == guid).ToListAsync();
+            //查找为该博客的评论，且没有父评论的评论
+            var comments = await _dbContext.Comments
+                .Where(c => c.BlogId.ToString() == blogId && (c.ParentId == null || c.ParentId == Guid.Empty))
+                .OrderBy(c => c.CreateOnTime)
+                .Skip((index - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
             return comments;
         }
+
+        //获取所有子评论，不分页
+        public async Task<IEnumerable<Comment>> GetChildrenCommentsAsync(string commentId)
+        {
+            Guid parentId = Guid.Parse(commentId);
+            return await _dbContext.Comments.Where(c => c.ParentId == parentId).ToListAsync();
+        }
+
+        /// <summary>
+        /// 分页查询：查找评论下的所有子评论
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="index">从1开始</param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<IEnumerable<Comment>> GetChildrenCommentsWithPagesAsync(string commentId, int pageSize, int index)
+        {
+            var comments = await _dbContext.Comments
+                .Where(c => c.ParentId.ToString() == commentId)
+                .Skip(pageSize * (index - 1))
+                .Take(pageSize)
+                .ToListAsync();
+            return comments;
+        }
+
+        //快捷错误result
+        private ResponseJsonResult<Comment> ErrorResult(string errorMsg)
+        {
+            var result = ResponseJsonResult<Comment>.Failed;
+            result.Message = errorMsg;
+            return result;
+        }
+
     }
 }

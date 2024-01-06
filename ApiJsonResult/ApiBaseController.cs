@@ -19,7 +19,7 @@ namespace ApiJsonResult
         /// <param name="data"></param>
         /// <param name="msg"></param>
         /// <returns></returns>
-        protected ResponseJsonResult<T> Success<T>(T? data,string? msg = null)
+        protected ResponseJsonResult<T> ResSuccess<T>(T? data,string? msg = null)
         {
             var statusCode = data == null ? MyStatusCode.Success_NoContet : MyStatusCode.Success; 
             var responseResult = new ResponseJsonResult<T>(data) { 
@@ -35,7 +35,7 @@ namespace ApiJsonResult
         /// <typeparam name="T"></typeparam>
         /// <param name="msg"></param>
         /// <returns></returns>
-        protected ResponseJsonResult<T> BadRequest<T>(string? msg = null)
+        protected ResponseJsonResult<T> ResBadRequest<T>(string? msg = null)
         {
             return new ResponseJsonResult<T>
             {
@@ -50,7 +50,7 @@ namespace ApiJsonResult
         /// <typeparam name="T"></typeparam>
         /// <param name="msg"></param>
         /// <returns></returns>
-        protected ResponseJsonResult<T> Unauthorized<T>(string? msg = null)
+        protected ResponseJsonResult<T> ResUnauthorized<T>(string? msg = null)
         {
             return new ResponseJsonResult<T>
             {
@@ -65,7 +65,7 @@ namespace ApiJsonResult
         /// <typeparam name="T"></typeparam>
         /// <param name="msg"></param>
         /// <returns></returns>
-        protected ResponseJsonResult<T> NotFound<T>(string? msg = null)
+        protected ResponseJsonResult<T> ResNotFound<T>(string? msg = null)
         {
             return new ResponseJsonResult<T>
             {

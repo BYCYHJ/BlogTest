@@ -26,7 +26,18 @@ namespace ApiJsonResult
         }
         public T? Data { get; set; }
 
+        //快速result设置
+        private static readonly ResponseJsonResult<T> _failed = new ResponseJsonResult<T>() { StatusCode = MyStatusCode.BadRequest};
+        private static readonly ResponseJsonResult<T> _success = new ResponseJsonResult<T>() { StatusCode=MyStatusCode.Success};
+        public static ResponseJsonResult<T> Failed => _failed;
+        public static ResponseJsonResult<T> Succeeded => _success;
+
         public ResponseJsonResult() { }
+
+        public ResponseJsonResult(string? msg = null)
+        {
+            this.Message = msg;
+        }
 
         public ResponseJsonResult(T? data) {
             this.Data = data;
@@ -41,6 +52,7 @@ namespace ApiJsonResult
             return new ResponseJsonResult<T>(data);
         }
 
+        //获取result执行者，以重写的Executor方法运行s
         public async Task ExecuteResultAsync(ActionContext context)
         {
             var services = context.HttpContext.RequestServices;

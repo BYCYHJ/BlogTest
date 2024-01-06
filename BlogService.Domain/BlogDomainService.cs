@@ -1,4 +1,5 @@
-﻿using BlogJWT;
+﻿using ApiJsonResult;
+using BlogJWT;
 using BlogService.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,6 @@ namespace BlogService.Domain
     {
         private readonly IBlogRepository blogRepository;
         private readonly ICommentRepository commentRepository;
-        //private readonly TokenCommen tokenCommon;
 
         public BlogDomainService(IBlogRepository blogRepository,ICommentRepository commentRepository) 
         {
@@ -46,25 +46,46 @@ namespace BlogService.Domain
         }
 
         /// <summary>
-        /// 根据id查找博客，返回博客以及包含的评论
+        /// 删除博客，以及博客下的所有评论
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="blogId"></param>
         /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        public async Task<(Blog targetBlog,List<Comment> comments)> GetTargetBlogById(string id)
+        public async Task<ResponseJsonResult<Blog>> DeleteBlogAsync(string blogId)
         {
-            Blog? targetBlog = await blogRepository.FindOneByIdAsync(id);
-            if (targetBlog == null)
+            Blog? blog = await blogRepository.FindOneByIdWithCommentsAsync(blogId);
+            if (blog == null)
             {
-                throw new Exception($"找不到id为{id}的博客");
+                return ErrorResult($"无法删除，原因是找不到id为{blogId}的博客");
             }
-            var comments = new List<Comment>();
-            var blogComments = await commentRepository.GetCommentsWithBlogIdAsync(id);
-            if(blogComments != null && blogComments.Any())
+            var comments = blog.Comments;
+            foreach (var comment in comments)
             {
-                comments = blogComments.ToList();
+                var result = await commentRepository.DeleteCommentAsync(comment.Id.ToString());
+                if(result.StatusCode != MyStatusCode.Success)
+                {
+                    return ErrorResult(result.Message);
+                }
             }
-            return (targetBlog,comments);
+            await blogRepository.DeleteBlogAsync(blogId);
+            return ResponseJsonResult<Blog>.Succeeded;
+        }
+
+        public async Task<IEnumerable<Blog>> FindAllPersonalBlogsAsync(string? userId,string? token=null)
+        {
+            if(userId == null && token == null)
+            {
+                throw new Exception("参数不正确，应至少含有userId或Token中的一个");
+            }
+            string userGuid;
+            if (userId == null)
+            {
+                userGuid = GetCurrentUserId(token!).ToString();
+            }
+            else
+            {
+                userGuid = userId;
+            }
+            return await blogRepository.GetPersonalAllBlogsAsync(userGuid);
         }
 
         /// <summary>
@@ -93,6 +114,13 @@ namespace BlogService.Domain
                 throw new Exception("无法取到用户id");
             }
             return Guid.Parse(userId);
+        }
+
+        private ResponseJsonResult<Blog> ErrorResult(string? msg=null)
+        {
+            var result = ResponseJsonResult<Blog>.Failed;
+            result.Message = msg;
+            return result;
         }
 
     }
