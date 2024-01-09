@@ -18,6 +18,7 @@ namespace BlogService.Infrastructure.TableConfig
         {
             builder.ToTable("blog_blogs");
             builder.Property(b => b.Content).HasColumnType("longtext");
+            //设置List<TagClass>到数据库的转换规则
             builder.Property(b => b.Tags).HasConversion(
                 t => string.Join(",", t.Select(tVal => tVal.ToString())),
                 t => t.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(

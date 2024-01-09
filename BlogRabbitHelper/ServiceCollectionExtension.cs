@@ -33,6 +33,7 @@ namespace BlogRabbitHelper
 
         public static IServiceCollection AddRabbitMqHelper(this IServiceCollection services,string exchangerType,string queueName, IEnumerable<Type> handlerTypes)
         {
+            //将所有handler注册
             foreach (var handlerType in handlerTypes)
             {
                 services.AddScoped(handlerType,handlerType);
@@ -60,10 +61,12 @@ namespace BlogRabbitHelper
                 foreach (var handlerType in handlerTypes)
                 {
                     var handlerAttrs = handlerType.GetCustomAttributes<EventNameAttribute>();
+                    //若没有特性则报错
                     if (!handlerAttrs.Any())
                     {
                         throw new Exception($"No Attribute with [EventName(routingkey)]");
                     }
+                    //将所包含的Event全部注册
                     foreach(var handlerAttr in handlerAttrs)
                     {
                         var eventName = handlerAttr.EventName;

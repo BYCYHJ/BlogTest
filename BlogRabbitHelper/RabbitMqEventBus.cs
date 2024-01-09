@@ -43,8 +43,9 @@ namespace BlogRabbitHelper
         public void Publish<T>(string eventName, T? data)
         {
             using var channel = _connection.CreateModel();
+            //声明交换机
             channel.ExchangeDeclare(exchange: _exchangeName,
-                type: "fanout",
+                type: "fanout",//模式为订阅模式
                 durable: true
                 );
             byte[] body;
@@ -76,10 +77,12 @@ namespace BlogRabbitHelper
         public void Subscribe(string eventName, Type handlerType, string exchangerType)
         {
             var consumeChannel = _connection.CreateModel();//不使用using销毁
+            //交换机声明
             consumeChannel.ExchangeDeclare(
                 exchange: _exchangeName,
                 type: exchangerType
                 );
+            //队列声明
             consumeChannel.QueueDeclare(
                 queue: _queueName,
                 durable: true,
@@ -96,7 +99,7 @@ namespace BlogRabbitHelper
                 var enventName = eventArgs.RoutingKey;
                 var data = Encoding.UTF8.GetString(eventArgs.Body.Span);//将生产者发送的byte[] msg转为json格式的字符串
                 await ProcessEvent(enventName,data);
-                consumeChannel.BasicAck(eventArgs.DeliveryTag,false);
+                consumeChannel.BasicAck(eventArgs.DeliveryTag,false);//确认
             };
 
         }
