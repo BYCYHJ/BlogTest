@@ -11,5 +11,12 @@ namespace SearchService.Infrastructure
         public Uri Uri { get; set; }
         public string UserName {  get; set; }
         public string Password { get; set; }
+        public ElasticSearchOptions() { }
+        public ElasticSearchOptions(string uri, string userName, string password)
+        {
+            Uri = new Uri(uri);
+            UserName = userName;
+            Password = password;
+        }
     }
 }

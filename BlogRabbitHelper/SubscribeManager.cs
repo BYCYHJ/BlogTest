@@ -10,7 +10,7 @@ namespace BlogRabbitHelper
     {
         //包含的所有handler
         //key为RoutingKey，即事件名称；List为订阅了该事件的所有handler的Type
-        private Dictionary<string, List<Type>> _handlers;
+        private Dictionary<string, List<Type>> _handlers = new Dictionary<string, List<Type>>();
 
         public void AddSubscription(string eventName,Type handlerType)
         {

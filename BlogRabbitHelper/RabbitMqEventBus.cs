@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
+using System.Threading.Channels;
+using Newtonsoft.Json;
 
 namespace BlogRabbitHelper
 {
@@ -31,7 +33,7 @@ namespace BlogRabbitHelper
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            _connection.Dispose();
         }
 
         /// <summary>
@@ -55,7 +57,8 @@ namespace BlogRabbitHelper
             }
             else
             {
-                var jsonData = JsonSerializer.Serialize(data);
+                var jsonData = JsonConvert.SerializeObject(data);
+                //var jsonData = JsonSerializer.Serialize(data);
                 body = Encoding.UTF8.GetBytes(jsonData);
             }
             var property = channel.CreateBasicProperties();
@@ -80,7 +83,8 @@ namespace BlogRabbitHelper
             //交换机声明
             consumeChannel.ExchangeDeclare(
                 exchange: _exchangeName,
-                type: exchangerType
+                type: exchangerType,
+                durable: true
                 );
             //队列声明
             consumeChannel.QueueDeclare(
@@ -89,7 +93,7 @@ namespace BlogRabbitHelper
                 exclusive: false,///是否排他, true排他的, 如果一个队列声明为排他队列, 该队列仅对首次声明它的连接可见, 并在连接断开时自动删除
                 autoDelete: false
                 );
-            consumeChannel.QueueBind(_queueName, _exchangeName, eventName);
+            consumeChannel.QueueBind(queue: _queueName, exchange: _exchangeName, routingKey: eventName,arguments:null);
 
             _subscriptionManager.AddSubscription(eventName, handlerType);//将订阅者加入集合
 
@@ -98,10 +102,10 @@ namespace BlogRabbitHelper
             {
                 var enventName = eventArgs.RoutingKey;
                 var data = Encoding.UTF8.GetString(eventArgs.Body.Span);//将生产者发送的byte[] msg转为json格式的字符串
-                await ProcessEvent(enventName,data);
-                consumeChannel.BasicAck(eventArgs.DeliveryTag,false);//确认
+                await ProcessEvent(enventName, data);
+                consumeChannel.BasicAck(eventArgs.DeliveryTag, false);//确认
             };
-
+            consumeChannel.BasicConsume(_queueName, false, consumer);//绑定消费者到队列
         }
 
         /// <summary>

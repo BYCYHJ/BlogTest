@@ -31,7 +31,7 @@ namespace BlogService.Domain
         /// <param name="token"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task CreateBlog(string title,string content,List<TagClass>? tags, string token,string? userId = null)
+        public async Task<Blog> CreateBlog(string title,string content,List<TagClass>? tags, string token,string? userId = null)
         {
             Guid userid;
             if (userId != null)
@@ -43,6 +43,7 @@ namespace BlogService.Domain
             }
             Blog blog = new Blog(title,content,userid,tags);
             await blogRepository.CreateBlogAsync(blog);
+            return blog;
         }
 
         /// <summary>

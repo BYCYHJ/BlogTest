@@ -10,6 +10,6 @@ namespace SearchService.Domain
     {
         Task UpsertAsync(BlogRecord blog);
         Task DeleteAsync(Guid blogId);
-        Task SearchBlogAsync(string keyword,int index,int pageSize);
+        Task<SearchBlogResponse> SearchBlogAsync(string keyword,int index,int pageSize);
     }
 }

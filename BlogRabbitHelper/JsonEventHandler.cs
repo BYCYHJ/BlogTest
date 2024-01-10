@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace BlogRabbitHelper
@@ -12,7 +12,7 @@ namespace BlogRabbitHelper
     {
         public Task Handle(string eventName, string eventData)
         {
-            T? data = JsonSerializer.Deserialize<T?>(eventData);
+            T? data = JsonConvert.DeserializeObject<T?>(eventData);
             return JsonHandle(eventName,data);
         }
 

@@ -1,5 +1,6 @@
 ﻿using ApiJsonResult;
 using BlogDomainCommons;
+using BlogRabbitHelper;
 using BlogService.Domain;
 using BlogService.Domain.Entities;
 using BlogService.Infrastructure;
@@ -16,10 +17,12 @@ namespace BlogService.WebApi.Controllers
     {
         private readonly BlogDomainService _blogService;
         private readonly IBlogRepository _blogRepository;
+        private readonly IEventBus _eventBus;
 
-        public BlogController(BlogDomainService blogDomainService,IBlogRepository blogRepository) { 
+        public BlogController(BlogDomainService blogDomainService,IBlogRepository blogRepository,IEventBus eventBus) { 
             _blogService = blogDomainService;
             _blogRepository = blogRepository;
+            _eventBus = eventBus;
         }
 
         //创建Blog
@@ -28,7 +31,9 @@ namespace BlogService.WebApi.Controllers
         public async Task CreateBlog(string title,string content,List<TagClass> tags,string? userId = null)
         {
             var token = GetToken();
-            await _blogService.CreateBlog(title, content, tags, token, userId);
+            Blog newBlog = await _blogService.CreateBlog(title, content, tags, token, userId);
+            //发布集成事件
+            _eventBus.Publish("Blog.Create",new {guid=newBlog.Id,title=newBlog.Title,content=newBlog.Content});
         }
 
         //删除指定的Blog
@@ -37,7 +42,12 @@ namespace BlogService.WebApi.Controllers
 
         public async Task<ResponseJsonResult<Blog>> DeleteBlog(string blogId)
         {
-            return await _blogService.DeleteBlogAsync(blogId);
+            var result = await _blogService.DeleteBlogAsync(blogId);
+            if(result.StatusCode == MyStatusCode.Success)
+            {
+                _eventBus.Publish("Blog.Delete",Guid.Parse(blogId));
+            }
+            return result;
         }
 
         //获得个人所有博客
@@ -54,7 +64,12 @@ namespace BlogService.WebApi.Controllers
         [UnitofWork(new Type[] { typeof(BlogServiceDbContext) })]
         public async Task<ResponseJsonResult<Blog>> UpdateBlog(Blog blog)
         {
-            return await _blogRepository.UpdateBlogAsync(blog);
+            var result = await _blogRepository.UpdateBlogAsync(blog);
+            if (result.StatusCode == MyStatusCode.Success)
+            {
+                _eventBus.Publish("Blog.Update", new { guid = blog.Id, title = blog.Title, content = blog.Content });
+            }
+            return result;
         }
 
 

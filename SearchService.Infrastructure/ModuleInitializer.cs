@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Nest;
 using System;
 using System.Collections.Generic;
@@ -16,9 +17,10 @@ namespace SearchService.Infrastructure
             //ElasticSesarch连接
             services.AddScoped<IElasticClient>(sp =>
             {
-                var options = sp.GetRequiredService<ElasticSearchOptions>();
+                var options = sp.GetRequiredService<IOptions<ElasticSearchOptions>>().Value;
                 var connectionSettings = new ConnectionSettings(options.Uri);
                 connectionSettings.BasicAuthentication(options.UserName, options.Password);
+                connectionSettings.DefaultIndex("index");
                 var esClient = new ElasticClient(connectionSettings);
                 return esClient;
             });

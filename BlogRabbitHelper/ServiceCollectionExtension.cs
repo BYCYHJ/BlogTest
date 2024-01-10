@@ -36,7 +36,7 @@ namespace BlogRabbitHelper
             //将所有handler注册
             foreach (var handlerType in handlerTypes)
             {
-                services.AddScoped(handlerType,handlerType);
+                services.AddScoped(handlerType, handlerType);
             }
             services.AddSingleton<IEventBus>(sp =>
             {
@@ -45,9 +45,9 @@ namespace BlogRabbitHelper
                 {
                     HostName = options.HostName,
                     Port = options.Port,
-                    DispatchConsumersAsync=true
+                    DispatchConsumersAsync = true
                 };
-                if(options.UserName != null)
+                if (options.UserName != null)
                 {
                     factory.UserName = options.UserName;
                 }
@@ -57,7 +57,7 @@ namespace BlogRabbitHelper
                 }
                 var connection = factory.CreateConnection();
                 var serviceScopeFactory = sp.GetService<IServiceScopeFactory>()!;
-                var eventBus = new RabbitMqEventBus(queueName:queueName,exchangeName:options.ExchangerName,connection, serviceScopeFactory);
+                var eventBus = new RabbitMqEventBus(queueName: queueName, exchangeName: options.ExchangerName, connection, serviceScopeFactory);
                 foreach (var handlerType in handlerTypes)
                 {
                     var handlerAttrs = handlerType.GetCustomAttributes<EventNameAttribute>();
@@ -67,10 +67,10 @@ namespace BlogRabbitHelper
                         throw new Exception($"No Attribute with [EventName(routingkey)]");
                     }
                     //将所包含的Event全部注册
-                    foreach(var handlerAttr in handlerAttrs)
+                    foreach (var handlerAttr in handlerAttrs)
                     {
                         var eventName = handlerAttr.EventName;
-                        eventBus.Subscribe(eventName,handlerType,exchangerType);
+                        eventBus.Subscribe(eventName, handlerType, exchangerType);
                     }
                 }
                 return eventBus;
