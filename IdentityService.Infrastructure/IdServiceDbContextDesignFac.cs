@@ -12,7 +12,7 @@ namespace IdentityService.Infrastructure
     {
         public IdServiceDbContext CreateDbContext(string[] args)
         {
-            string conStr = "Server=localhost;Database=blog_d1;Uid=root;Pwd=15550239;";
+            string conStr = "Server=47.109.141.21;Port=3306;Database=blog_d1;Uid=root;Pwd=15550239;";
             var builder = new DbContextOptionsBuilder<IdServiceDbContext>();
             builder.UseMySql(conStr,ServerVersion.Parse("8.0.34-mysql"));
             IdServiceDbContext ctx = new IdServiceDbContext(builder.Options);

@@ -55,6 +55,7 @@ namespace BlogRabbitHelper
                 {
                     factory.Password = options.Password;
                 }
+                factory.VirtualHost = "master";
                 var connection = factory.CreateConnection();
                 var serviceScopeFactory = sp.GetService<IServiceScopeFactory>()!;
                 var eventBus = new RabbitMqEventBus(queueName: queueName, exchangeName: options.ExchangerName, connection, serviceScopeFactory);
