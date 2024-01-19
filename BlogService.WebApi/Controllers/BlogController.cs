@@ -28,10 +28,10 @@ namespace BlogService.WebApi.Controllers
         //创建Blog
         [HttpPost]
         [UnitofWork(new Type[] { typeof(BlogServiceDbContext) })]
-        public async Task CreateBlog(string title,string content,List<TagClass> tags,string? userId = null)
+        public async Task CreateBlog([FromBody]BlogResponse blog)
         {
             var token = GetToken();
-            Blog newBlog = await _blogService.CreateBlog(title, content, tags, token, userId);
+            Blog newBlog = await _blogService.CreateBlog(blog.Title, blog.Content, blog.Tags, token, blog.UserId);
             //发布集成事件
             _eventBus.Publish("Blog.Create",new {guid=newBlog.Id,title=newBlog.Title,content=newBlog.Content});
         }
@@ -62,7 +62,7 @@ namespace BlogService.WebApi.Controllers
         //更新博客
         [HttpPut]
         [UnitofWork(new Type[] { typeof(BlogServiceDbContext) })]
-        public async Task<ResponseJsonResult<Blog>> UpdateBlog(Blog blog)
+        public async Task<ResponseJsonResult<Blog>> UpdateBlog([FromBody]Blog blog)
         {
             var result = await _blogRepository.UpdateBlogAsync(blog);
             if (result.StatusCode == MyStatusCode.Success)
@@ -74,7 +74,6 @@ namespace BlogService.WebApi.Controllers
 
 
         [NoWrap]
-
         private string GetToken()
         {
             string token = this.HttpContext.Request.Headers["Authorization"]!;

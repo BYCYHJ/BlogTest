@@ -59,14 +59,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 
 //cors
-builder.Services.AddCors(opt =>
-{
-    opt.AddDefaultPolicy(builder =>
-    {
-        string[] method = { "GET","POST","PATCH","PUT","DELETE" };
-        builder.AllowAnyOrigin().AllowCredentials().AllowAnyHeader().WithMethods(method);
-    });
-});
+//builder.Services.AddCors(opt =>
+//{
+//    opt.AddDefaultPolicy(builder =>
+//    {
+//        string[] method = { "GET","POST","PATCH","PUT","DELETE" };
+//        builder.WithOrigins("*").AllowCredentials().AllowAnyHeader().WithMethods(method);
+//    });
+//});
 
 if (builder.Environment.IsDevelopment())
 {
@@ -110,6 +110,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+//app.UseCors();
 
 app.UseAuthorization();
 

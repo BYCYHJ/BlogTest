@@ -21,11 +21,17 @@ namespace BlogService.Domain.Entities
         public Comment? ParentComment { get; private set; }//所属的评论(引用属性)
 
         private Comment() { }
-
-        public Comment(string content,string userId,string blogId,string? parentId = null)
+        public Comment(string content, string blogId,string? userId=null, string? parentId = null)
         {
             this.Content = content;
-            this.UserId = Guid.Parse(userId);
+            if(userId is not null)
+            {
+                this.UserId = Guid.Parse(userId);
+            }
+            else
+            {
+                this.UserId = Guid.Empty;
+            }
             this.BlogId = Guid.Parse(blogId);
             this.ParentId = parentId is null ? null : Guid.Parse(parentId);
         }

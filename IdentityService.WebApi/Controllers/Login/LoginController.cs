@@ -27,7 +27,7 @@ namespace IdentityService.WebApi.Controllers.Login
         //根据用户名、密码登录
         [AllowAnonymous]
         [HttpPost]
-        public async Task<ActionResult<string?>> LoginWithNameAndPwd(UserResponse loginInfo)
+        public async Task<ActionResult<string?>> LoginWithNameAndPwd([FromBody]UserResponse loginInfo)
         {
             var result = await idService.CheckUserAndPasswordAsync(loginInfo.userName, loginInfo.password);
             if (!result.checkResult.Succeeded)
@@ -64,7 +64,7 @@ namespace IdentityService.WebApi.Controllers.Login
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<ActionResult<string?>> LoginWithPhone(string phone, string code)
+        public async Task<ActionResult<string?>> LoginWithPhone(string phone,string code)
         {
             var result = await idService.CheckPhoneAndTokenAsync(phone, code);
             if (result.Succeeded)
@@ -92,10 +92,10 @@ namespace IdentityService.WebApi.Controllers.Login
 
         [Authorize]
         [HttpPatch]
-        public async Task<ActionResult> ChangePassword(string currentPwd, string newPwd)
+        public async Task<ActionResult> ChangePassword([FromBody]UpdatePwdResponse pwdResponse)
         {
             var userId = Guid.Parse(this.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var result = await idRepository.ChangePwdAsync(userId, currentPwd, newPwd);
+            var result = await idRepository.ChangePwdAsync(userId, pwdResponse.currentPwd, pwdResponse.newPwd);
             if (result.Succeeded)
             {
                 return Ok();

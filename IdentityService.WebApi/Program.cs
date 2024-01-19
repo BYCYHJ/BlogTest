@@ -39,6 +39,7 @@ builder.Services.AddStackExchangeRedisCache(opt =>
 if (builder.Environment.IsProduction())
 {
     //builder.Services.AddScoped<ISendMail,>();
+    builder.Services.AddScoped<ISendMail, SendMockMail>();//模拟短信发送
 }
 else
 {
@@ -86,14 +87,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
    });
 
 //CORS
-builder.Services.AddCors(opt =>
-{
-    opt.AddDefaultPolicy(builder =>
-    {
-        string[] urls = new string[] { "http://localhost:5208" };
-        builder.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins(urls);
-    });
-});
+//builder.Services.AddCors(opt =>
+//{
+//    opt.AddDefaultPolicy(builder =>
+//    {
+//        string[] method = { "GET", "POST", "PATCH", "PUT", "DELETE" };
+//        builder.WithOrigins("*").AllowCredentials().AllowAnyOrigin().WithMethods(method);
+//    });
+//});
 
 var arms = ReflectionHelper.GetAllReferencedAssemblies();//所有程序集
 builder.Services.RunModuleInitializers(arms);//注册服务
@@ -114,7 +115,8 @@ if (app.Environment.IsDevelopment())
 }
 
 
-app.UseCors();//Cors
+//app.UseCors();//Cors
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();//token验证

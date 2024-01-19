@@ -56,6 +56,16 @@ builder.Services.Configure<MvcOptions>(opt =>
     opt.Filters.Add<ResultExceptionFilter>();//异常处理过滤器
 });
 
+//cors
+//builder.Services.AddCors(opt =>
+//{
+//    opt.AddDefaultPolicy(builder =>
+//    {
+//        string[] method = { "GET", "POST", "PATCH", "PUT", "DELETE" };
+//        builder.WithOrigins("*").AllowCredentials().AllowAnyHeader().WithMethods(method);
+//    });
+//});
+
 if (builder.Environment.IsDevelopment())
 {
     #region Swagger授权按钮
@@ -96,6 +106,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+//app.UseCors();
 
 app.UseHttpsRedirection();
 

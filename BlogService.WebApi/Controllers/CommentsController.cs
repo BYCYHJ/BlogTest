@@ -23,13 +23,18 @@ namespace BlogService.WebApi.Controllers
 
         [HttpPost]
         [UnitofWork(new Type[] { typeof(BlogServiceDbContext) })]
-        public async Task CreateComment(string content,string blogId, string? userId = null,string? parentId = null)
+        public async Task CreateComment([FromBody]CommentResponse commentRes)
         {
-            if(userId == null)
+            string userId = null;
+            if( String.IsNullOrEmpty(commentRes.userId))
             {
                 userId = GetCurrentUserId();
             }
-            Comment comment = new Comment(content, userId, blogId, parentId);
+            else
+            {
+                userId = commentRes.userId;
+            }
+            Comment comment = new Comment(content:commentRes.content,blogId:commentRes.blogId,userId:userId,parentId:commentRes.parentId);
             await _commentRepository.CreateCommentAsync(comment);
         }
 
