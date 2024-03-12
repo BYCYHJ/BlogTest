@@ -46,7 +46,7 @@ builder.Services.Configure<JWTOptions>(builder.Configuration.GetSection("JWT"));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     var jwtOpt = builder.Configuration.GetSection("JWT").Get<JWTOptions>();
-    byte[] bytes = Encoding.UTF8.GetBytes(jwtOpt.Key);
+    byte[] bytes = Encoding.UTF8.GetBytes(jwtOpt!.Key);
     var secKey = new SymmetricSecurityKey(bytes);
     options.TokenValidationParameters = new()
     {

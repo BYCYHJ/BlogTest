@@ -52,5 +52,6 @@ namespace RedisHelper
             options.SetAbsoluteExpiration(TimeSpan.FromSeconds(expireSeconds));
             await _cache.SetStringAsync(key,value,options);
         }
+
     }
 }
