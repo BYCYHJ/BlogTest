@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace SearchService.Domain
 {
-    public record BlogRecord(Guid guid,string Title,string Content);
+    public record BlogRecord(Guid guid,string Title,string Content,string? PreviewPhoto = null);
 }

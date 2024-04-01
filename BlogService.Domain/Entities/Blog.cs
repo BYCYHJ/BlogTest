@@ -9,13 +9,15 @@ namespace BlogService.Domain.Entities
         public List<TagClass> Tags { get; set; } = new List<TagClass>();//文章标签
         public Guid UserId { get; init; }//作者
         public int StartCount { get; private set; } = 0;//点赞数
+        public string? PreviewPhoto { get; private set; }//博客预览图
         public List<Comment> Comments { get; set; } = new List<Comment>();//评论
+
 
         private Blog()
         {
         }
 
-        public Blog(string title, string content, Guid userId,List<TagClass>? tags = null)
+        public Blog(string title, string content, Guid userId,List<TagClass>? tags = null,string? previewPhoto=null)
         {
             Title = title;
             Content = content;
@@ -28,6 +30,7 @@ namespace BlogService.Domain.Entities
             {
                 this.Tags.Add(TagClass.All);//为空则自动设置为All标签
             }
+            PreviewPhoto = previewPhoto;
         }
 
         //修改博客
@@ -63,6 +66,12 @@ namespace BlogService.Domain.Entities
                 StartCount--;
             }
             StartCount = 0;
+        }
+
+        //修改预览图
+        public void UpdatePreviewPhoto(string url)
+        {
+            PreviewPhoto = url;
         }
     }
 }

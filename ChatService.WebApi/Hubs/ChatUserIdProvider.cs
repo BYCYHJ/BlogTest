@@ -14,7 +14,8 @@ namespace ChatService.WebApi.Hubs
         {
             string connectionId = connection.ConnectionId;
             ConnectionMapping<string> mapping = new ConnectionMapping<string>();
-            return mapping.GetUser(connectionId);
+            string userId = mapping.GetUser(connectionId)!;
+            return userId;
         }
     }
 }

@@ -11,7 +11,11 @@ namespace SearchService.Infrastructure
             this.esClient = esClient;
         }
 
-        //删除
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="blogId"></param>
+        /// <returns></returns>
         public Task DeleteAsync(Guid blogId)
         {
             DocumentPath<BlogRecord> deletePath = new DocumentPath<BlogRecord>(blogId);
@@ -68,7 +72,12 @@ namespace SearchService.Infrastructure
             return response;
         }
 
-        //插入及更新
+        /// <summary>
+        /// 插入及更新
+        /// </summary>
+        /// <param name="blog"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task UpsertAsync(BlogRecord blog)
         {
             var response = await esClient.UpdateAsync<BlogRecord>(blog.guid, u => u

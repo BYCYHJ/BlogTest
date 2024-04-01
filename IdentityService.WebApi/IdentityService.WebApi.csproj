@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BlogJWT\BlogJWT.csproj" />
+    <ProjectReference Include="..\Commons\BlogDomainCommons.csproj" />
     <ProjectReference Include="..\Identity.Domain\Identity.Domain.csproj" />
     <ProjectReference Include="..\IdentityService.Infrastructure\IdentityService.Infrastructure.csproj" />
   </ItemGroup>

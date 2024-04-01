@@ -23,14 +23,15 @@ namespace ChatService.Domain
                 {
                     //创建新的HashSet当作value
                     connections = new HashSet<string>();
+                    connections.Add(connectionId);
                     _connections.Add(key, connections);
                 }
                 //如果存在则直接在HashSet中添加
                 else
                 {
-                    lock (connections)
+                    lock (_connections)
                     {
-                        connections.Add(connectionId);
+                        _connections[key].Add(connectionId);
                     }
                 }
             }
@@ -62,6 +63,20 @@ namespace ChatService.Domain
                         }
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// 无userId情况下移除connectionId绑定
+        /// </summary>
+        /// <param name="connectionId"></param>
+        public void Remove(string connectionId)
+        {
+            T? userId = GetUser(connectionId);
+            if (userId == null) return;
+            lock (_connections)
+            {
+                _connections[userId].Remove(connectionId);
             }
         }
 

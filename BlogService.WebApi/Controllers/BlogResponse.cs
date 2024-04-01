@@ -2,5 +2,5 @@
 
 namespace BlogService.WebApi.Controllers
 {
-    public record BlogResponse(string Title,string Content,List<TagClass>? Tags,string? UserId=null);
+    public record BlogResponse(string Title,string Content,List<TagClass>? Tags,string? UserId=null,string? previewStr=null);
 }

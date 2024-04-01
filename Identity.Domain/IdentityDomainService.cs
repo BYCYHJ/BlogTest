@@ -105,5 +105,20 @@ namespace Identity.Domain
             string token = _tokenService.BuildToken(claims,_jwtOpt.Value);
             return token;
         }
+
+        /// <summary>
+        /// 更新用户信息
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public async Task<IdentityResult> UpdateUserInfoAsync(User user)
+        {
+            return await _identityRepository.UpdateUserAsync(user);
+        }
+
+        public async Task<User?> FindOneByIdAsync(string id)
+        {
+            return await _identityRepository.FindOneUserByIdAsync(id);
+        }
     }
 }

@@ -28,11 +28,8 @@ builder.Services.AddStackExchangeRedisCache(opt =>
     opt.Configuration = builder.Configuration.GetSection("Redis").Value;
     opt.InstanceName = "BlogCache_";//Ç°×º
 });//redis»º´æ
-//builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
-//{
-//    string conStr = builder.Configuration.GetSection("Redis").Value!;
-//    return ConnectionMultiplexer.Connect(conStr);
-//});
+
+builder.Services.AddHttpClient();
 
 
 //¶ÌÐÅ·¢ËÍ

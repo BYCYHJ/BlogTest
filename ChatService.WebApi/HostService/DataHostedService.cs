@@ -35,7 +35,7 @@ namespace ChatService.WebApi.HostService
                             //获取key中的所有数据
                             var messages = await _chatService.GetRedisMsgsAsync(key);
                             //上传到mysql
-                            await _chatService.UpdateToSql(key, messages);
+                            await _chatService.InsertToSql(key, messages);
                             //删除key
                             await _chatService.DeleteRedisList(key);
                         }

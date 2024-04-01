@@ -2,6 +2,7 @@
 using ChatService.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SqlHelper;
 
 namespace ChatService.WebApi.Controllers
 {
@@ -25,7 +26,21 @@ namespace ChatService.WebApi.Controllers
                 RecipientId="bbb"
             };
             string key = "test";
-            await _domainService.UpdateToRedis(key, msgTest);
+            await _domainService.InsertToRedis(key, msgTest);
+        }
+
+        [HttpGet]
+        public string GetCreateSql()
+        {
+            string sql = BaiSqlHelper.CreateTableSql<Message>("aaa");
+            return sql;
+        }
+
+        [HttpGet]
+        public string GetUpdateSql()
+        {
+            Message msg = new Message() { RecipientId = "aaa", Type = MessageType.Text, SenderId = "bbb" };
+            return BaiSqlHelper.UpdateSql(msg,"aaa");
         }
     }
 }

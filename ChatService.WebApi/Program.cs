@@ -1,9 +1,11 @@
+using ChatService.Domain;
 using ChatService.Infrastructure;
 using ChatService.WebApi.HostService;
 using ChatService.WebApi.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using RedisHelper;
+using System.Reflection;
 using Zack.Commons;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,8 +24,20 @@ builder.Services.AddDbContext<ChatServiceDbContext>(opt =>
 });
 
 //SignalR
-builder.Services.AddSignalR();
-builder.Services.AddSingleton<ChatUserIdProvider>();//添加自定义userId映射
+builder.Services.AddSignalR(hubOpt =>
+{
+    hubOpt.ClientTimeoutInterval = TimeSpan.FromSeconds(120);//客户端120s未发送消息则暂时断开连接
+});
+//builder.Services.AddSingleton<IUserIdProvider,ChatUserIdProvider>();//添加自定义userId映射
+
+//添加MediatR
+//builder.Services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
+//添加内存缓存
+builder.Services.AddMemoryCache();
+
+//映射类
+builder.Services.AddSingleton(typeof(ConnectionMapping<>));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

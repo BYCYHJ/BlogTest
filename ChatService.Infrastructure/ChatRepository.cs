@@ -26,18 +26,9 @@ namespace ChatService.Infrastructure
             if (result != 1)
             {
                 //创建表
-                await _chatDbContext.Database.ExecuteSqlRawAsync("CREATE TABLE "
-                    + "_"+name
-                    + @"(
-                        Id INT AUTO_INCREMENT PRIMARY KEY,
-                        Type VARCHAR(50) NOT NULL,
-                        SenderId VARCHAR(50) NOT NULL,
-                        RecipientId VARCHAR(50) NOT NULL,
-                        SendTime DATETIME,
-                        SendMsg TEXT,
-                        DataRoute VARCHAR(255)
-                    ) ENGINE = InnoDB DEFAULT CHARSET = utf8;"
-                    );
+                //sql语句
+                string sql =  BaiSqlHelper.CreateTableSql<Message>(actualName);
+                await _chatDbContext.Database.ExecuteSqlRawAsync(sql);
                 _chatDbContext.SaveChanges();
             }
         }
@@ -50,7 +41,7 @@ namespace ChatService.Infrastructure
         public IEnumerable<Message> GetSqlMessages(string key, int count, bool inverse = true)
         {
             string isInverse = inverse ? "DESC" : "ASC";
-            var messages  = _chatDbContext.Messages.FromSql($"SELECT * FROM {key} ORDER BY Id {isInverse} LIMIT {count}").ToList();
+            var messages  = _chatDbContext.Messages.FromSql($"SELECT * FROM {key} ORDER BY SendTime {isInverse} LIMIT {count}").ToList();
             return messages;
         }
 
@@ -79,6 +70,13 @@ namespace ChatService.Infrastructure
         public async Task<IEnumerable<Message>> GetRedisMessage(string key)
         {
             return await _redisHelper.ListGetAsync<Message>(key);
+        }
+
+        public async Task UpdateMsgAsync(Message message, string tableName)
+        {
+            string sql = BaiSqlHelper.UpdateSql(message,tableName);
+            await _chatDbContext.Database.ExecuteSqlRawAsync(sql);
+            _chatDbContext.SaveChanges();
         }
     }
 }

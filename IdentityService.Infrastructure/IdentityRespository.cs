@@ -185,5 +185,16 @@ namespace IdentityService.Infrastructure
 
             return result.ToString();
         }
+
+        /// <summary>
+        /// 更新用户信息
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<IdentityResult> UpdateUserAsync(User user)
+        {
+           return await  _userManager.UpdateAsync(user);
+        }
     }
 }

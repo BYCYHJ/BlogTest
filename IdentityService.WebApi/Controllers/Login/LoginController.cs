@@ -87,7 +87,12 @@ namespace IdentityService.WebApi.Controllers.Login
             {
                 return NotFound();
             }
-            else return new { userName = user.UserName, phoneNumber = user.PhoneNumber };
+            else return new { 
+                userId = user.Id, 
+                userName = user.UserName, 
+                phoneNumber = user.PhoneNumber, 
+                avatarUrl = user.AvatarUrl 
+            };
         }
 
         [Authorize]
@@ -108,7 +113,7 @@ namespace IdentityService.WebApi.Controllers.Login
         [HttpPost]
         public async Task<ActionResult> CreateWorld()
         {
-            string username = "AnAn";
+            string username = "BaiBai";
             string password = "15550239";
             var result = await idRepository.CreateUserAsync(username, password);
             if (!result.Succeeded)
@@ -119,10 +124,10 @@ namespace IdentityService.WebApi.Controllers.Login
             var role2 = "normalUser";
             try
             {
-                await idRepository.CreateRoleAsync(role1);
-                await idRepository.CreateRoleAsync(role2);
+                //await idRepository.CreateRoleAsync(role1);
+                //await idRepository.CreateRoleAsync(role2);
                 var user = await idRepository.FindOneUserByNameAsync(username);
-                await idRepository.AddRoleToUserAsync(user, role1);
+                await idRepository.AddRoleToUserAsync(user!, role1);
                 return Ok();
             }
             catch (Exception e)

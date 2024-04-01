@@ -57,6 +57,14 @@ namespace ChatService.Domain
         Task CreateTableAsync(string name);
 
         /// <summary>
+        /// 更新一条message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        Task UpdateMsgAsync(Message message,string tableName);
+
+        /// <summary>
         /// 删除redis中的指定key
         /// </summary>
         /// <param name="key"></param>

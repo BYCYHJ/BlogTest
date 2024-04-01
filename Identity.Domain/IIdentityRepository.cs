@@ -19,6 +19,7 @@ namespace Identity.Domain
         Task<IdentityResult> CreateUserAsync(string name,string password);//创建用户，通过用户名、密码
         Task<IdentityResult> CreateUserByPhoneAsync(string phoneNumber);//创建用户，通过手机号
         Task<IdentityResult> CreateRoleAsync(string roleName);//创建角色
+        Task<IdentityResult> UpdateUserAsync(User user);//更新用户信息
 
         /// <summary>
         /// 生成密码重置令牌

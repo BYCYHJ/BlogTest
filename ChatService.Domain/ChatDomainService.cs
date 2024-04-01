@@ -42,7 +42,7 @@ namespace ChatService.Domain
         /// <param name="msgKey"></param>
         /// <param name="msg"></param>
         /// <returns></returns>
-        public async Task UpdateToRedis(string msgKey, Message msg)
+        public async Task InsertToRedis(string msgKey, Message msg)
         {
             await chatRepository.UploadMsgToRedisAsync(message: msg, key: msgKey);
         }
@@ -53,12 +53,26 @@ namespace ChatService.Domain
         /// <param name="tableName"></param>
         /// <param name="msgs"></param>
         /// <returns></returns>
-        public async Task UpdateToSql(string tableName, IEnumerable<Message> msgs)
+        public async Task InsertToSql(string tableName, IEnumerable<Message> msgs)
         {
             //查询该表是否存在，如果没有该表则创建一个新表
             await chatRepository.CreateTableAsync(tableName);
             //将数据插入到表中
             await chatRepository.UploadMsgToSqlAsync(tableName: tableName, messages: msgs);
+        }
+
+        /// <summary>
+        /// 更新message为已读
+        /// </summary>
+        /// <param name="msgs"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public async Task SetMsgHaveRead(List<Message> msgs,string tableName) {
+            foreach (var msg in msgs)
+            {
+                msg.SetHaveRead(true);
+                await chatRepository.UpdateMsgAsync(msg,tableName);
+            }
         }
 
         /// <summary>
@@ -77,7 +91,7 @@ namespace ChatService.Domain
         /// <param name="pattern">匹配字</param>
         /// <param name="size">查询规模，不影响输出结果</param>
         /// <returns></returns>
-        public async Task<IEnumerable<string>> GetPatternKeyAsync(string pattern,int size = 1000)
+        public async Task<IEnumerable<string>> GetPatternKeyAsync(string pattern, int size = 1000)
         {
             return await chatRepository.GetPatternKeys(pattern, size);
         }
@@ -88,18 +102,18 @@ namespace ChatService.Domain
         /// <param name="id1"></param>
         /// <param name="id2"></param>
         /// <returns></returns>
-        public string CreateTableName(string id1,string id2)
+        public string CreateTableName(string id1, string id2)
         {
-            List<string> ids = new List<string> { id1,id2};
+            List<string> ids = new List<string> { id1, id2 };
             ids.Sort();//排序，以防止出现id1_id2和id2_id1两种组合导致表名不唯一
             string idCombine = string.Join("_", ids);
             //使用MD5进行哈希作为表名
-            using(MD5 md5 = MD5.Create())
+            using (MD5 md5 = MD5.Create())
             {
                 byte[] idByte = Encoding.UTF8.GetBytes(idCombine);
                 byte[] hashByte = md5.ComputeHash(idByte);
                 StringBuilder sb = new StringBuilder();
-                foreach(byte b in hashByte)
+                foreach (byte b in hashByte)
                 {
                     sb.Append(b.ToString("x2"));
                 }
