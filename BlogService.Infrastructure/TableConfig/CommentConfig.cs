@@ -15,8 +15,15 @@ namespace BlogService.Infrastructure.TableConfig
         {
             builder.ToTable("blog_comment");
             builder.Property(c => c.Content).HasMaxLength(600);
-            builder.HasOne<Blog>(c => c.Blog).WithMany(b => b.Comments).HasForeignKey(c => c.BlogId);//Blog一对多Comment
-            builder.HasOne<Comment>(c => c.ParentComment).WithMany(c => c.ChildrenComments).HasForeignKey(c => c.ParentId);//自引用一对多
+            builder.HasOne<Blog>(c => c.Blog)
+                .WithMany(b => b.Comments)
+                .HasForeignKey(c => c.BlogId)
+                .OnDelete(DeleteBehavior.Cascade);//Blog一对多Comment,启用级联删除
+            builder.HasOne<Comment>(c => c.ParentComment)
+                .WithMany(c => c.ChildrenComments)
+                .HasForeignKey(c => c.ParentId)
+                .OnDelete(DeleteBehavior.Cascade);//自引用一对多，启用级联删除
+            builder.HasIndex(c => new { c.UserId, c.BlogId, c.ParentId,c.HighestCommentId});
         }
     }
 }

@@ -81,7 +81,7 @@ namespace ChatService.Domain
         }
 
         /// <summary>
-        /// 获取该用户的所以连接
+        /// 获取该用户的所有连接
         /// </summary>
         /// <param name="key"></param>
         /// <returns>以集合形式返回该用户的连接</returns>

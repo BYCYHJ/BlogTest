@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ApiJsonResult\ApiJsonResult.csproj" />
     <ProjectReference Include="..\BlogJWT\BlogJWT.csproj" />
+    <ProjectReference Include="..\CommenHelper\CommenHelper.csproj" />
     <ProjectReference Include="..\Commons\BlogDomainCommons.csproj" />
   </ItemGroup>
 

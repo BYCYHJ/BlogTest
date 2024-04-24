@@ -21,6 +21,11 @@ namespace BlogService.Infrastructure
             _dbContext = dbContext;
         }
 
+        public async Task<bool> CommentExistAsync(Guid guid)
+        {
+            return await _dbContext.Comments.AnyAsync(c => c.Id ==  guid);
+        }
+
         public async Task CreateCommentAsync(Comment comment)
         {
             await _dbContext.Comments.AddAsync(comment);
@@ -49,13 +54,21 @@ namespace BlogService.Infrastructure
             return ResponseJsonResult<Comment>.Succeeded;
         }
 
-        //根据id查找指定评论
+        /// <summary>
+        /// 根据id查找指定评论
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <returns></returns>
         public async Task<Comment?> FindOneByIdAsync(string commentId)
         {
             return await _dbContext.Comments.Where(c => c.Id.ToString() == commentId).FirstOrDefaultAsync();
         }
 
-        //获取博客下的所有评论，不分页
+        /// <summary>
+        /// 获取博客下的所有评论，不分页
+        /// </summary>
+        /// <param name="blogId"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<Comment>> GetBlogCommentsAsync(string blogId)
         {
             Guid blogGuid = Guid.Parse(blogId);
@@ -82,7 +95,11 @@ namespace BlogService.Infrastructure
             return comments;
         }
 
-        //获取所有子评论，不分页
+        /// <summary>
+        /// 获取所有子评论，不分页
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<Comment>> GetChildrenCommentsAsync(string commentId)
         {
             Guid parentId = Guid.Parse(commentId);
@@ -96,13 +113,13 @@ namespace BlogService.Infrastructure
         /// <param name="pageSize"></param>
         /// <param name="index">从1开始</param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
         public async Task<IEnumerable<Comment>> GetChildrenCommentsWithPagesAsync(string commentId, int pageSize, int index)
         {
             var comments = await _dbContext.Comments
-                .Where(c => c.ParentId.ToString() == commentId)
+                .Where(c => c.HighestCommentId == commentId)
                 .Skip(pageSize * (index - 1))
                 .Take(pageSize)
+                .Include(commnet => commnet.ParentComment)
                 .ToListAsync();
             return comments;
         }

@@ -12,4 +12,10 @@
         string message,
         string data
         );
+
+    public record UserInfo(
+        string id,
+        string? avatarUrl,
+        string userName
+        );
 }

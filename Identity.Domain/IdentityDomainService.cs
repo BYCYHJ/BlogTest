@@ -120,5 +120,15 @@ namespace Identity.Domain
         {
             return await _identityRepository.FindOneUserByIdAsync(id);
         }
+
+        /// <summary>
+        /// 获取多个用户信息
+        /// </summary>
+        /// <param name="userIds"></param>
+        /// <returns></returns>
+        public IEnumerable<(string id, string name, string? avatarUrl)> FindBulkUsers(IEnumerable<string> userIds)
+        {
+            return _identityRepository.FindBulkUsers(userIds);
+        }
     }
 }

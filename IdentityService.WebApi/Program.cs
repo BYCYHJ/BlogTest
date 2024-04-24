@@ -1,6 +1,7 @@
 using BlogJWT;
 using Identity.Domain;
 using IdentityService.Infrastructure;
+using IdentityService.WebApi.Protos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -83,15 +84,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
        };
    });
 
-//CORS
-//builder.Services.AddCors(opt =>
-//{
-//    opt.AddDefaultPolicy(builder =>
-//    {
-//        string[] method = { "GET", "POST", "PATCH", "PUT", "DELETE" };
-//        builder.WithOrigins("*").AllowCredentials().AllowAnyOrigin().WithMethods(method);
-//    });
-//});
+//RPC
+builder.Services.AddGrpcClient<FileApi.FileApiClient>(options =>
+{
+    options.Address = new Uri(builder.Configuration.GetSection("FileServer").Value!);
+});
+
 
 var arms = ReflectionHelper.GetAllReferencedAssemblies();//所有程序集
 builder.Services.RunModuleInitializers(arms);//注册服务

@@ -53,6 +53,11 @@ namespace BlogService.Domain.Entities
             }
         }
 
+        public void ChangeBlog(string content)
+        {
+            this.Content = content;
+        }
+
         //增加点赞数
         public void AddStar()
         {

@@ -28,6 +28,9 @@ namespace FileService.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("BlogId")
+                        .HasColumnType("longtext");
+
                     b.Property<DateTime>("CreateOnTime")
                         .HasColumnType("datetime(6)");
 
@@ -44,6 +47,9 @@ namespace FileService.Infrastructure.Migrations
 
                     b.Property<string>("FileUrl")
                         .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PreviewPhoto")
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("UpdateTime")

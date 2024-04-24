@@ -17,5 +17,11 @@ namespace BlogService.Domain
         Task<IEnumerable<Comment>> GetChildrenCommentsAsync(string commentId);
         Task CreateCommentAsync(Comment comment);
         Task<ResponseJsonResult<Comment>> DeleteCommentAsync(string commentId);
+        /// <summary>
+        /// 查找该条评论是否存在
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <returns></returns>
+        Task<bool> CommentExistAsync(Guid guid);
     }
 }

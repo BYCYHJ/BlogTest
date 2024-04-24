@@ -1,6 +1,7 @@
 ﻿using ApiJsonResult;
 using BlogJWT;
 using BlogService.Domain.Entities;
+using CommenHelper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +32,7 @@ namespace BlogService.Domain
         /// <param name="token"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<Blog> CreateBlog(string title,string content,List<TagClass>? tags, string token,string? userId = null)
+        public async Task<Blog> CreateBlog(string title,string content,List<TagClass>? tags, string token,string? userId = null,string? previewStr=null)
         {
             Guid userid;
             if (userId != null)
@@ -41,9 +42,57 @@ namespace BlogService.Domain
             else {
                 userid = GetCurrentUserId(token);
             }
-            Blog blog = new Blog(title,content,userid,tags);
+            Blog blog = new Blog(title,content,userid,tags,previewStr);
             await blogRepository.CreateBlogAsync(blog);
             return blog;
+        }
+
+        /// <summary>
+        /// 创建博客
+        /// </summary>
+        /// <param name="blog"></param>
+        /// <returns></returns>
+        public async Task<Blog> CreateBlog(Blog blog)
+        {
+            await blogRepository.CreateBlogAsync(blog);
+            return blog;
+        }
+
+        /// <summary>
+        /// 更新博客
+        /// </summary>
+        /// <param name="blog"></param>
+        /// <returns></returns>
+        public async Task<ResponseJsonResult<Blog>> UpdateBlog(Blog blog)
+        {
+            return await blogRepository.UpdateBlogAsync(blog);
+        }
+
+        /// <summary>
+        /// 根据id返回唯一博客
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<Blog?> GetBlogById(string id)
+        {
+            return await blogRepository.FindOneByIdNoCommentsAsync(id);
+        }
+
+        /// <summary>
+        /// 根据赞数排序分页返回blog
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<Blog>> GetRecommendBlogsAsync(int index,int pageSize)
+        {
+            var blogs = await blogRepository.GetRecommendBlogsAsync(index, pageSize);
+            //将blog的文本内容替换为无html标签
+            foreach (var blog in blogs)
+            {
+                blog.ChangeBlog(HtmlHelper.RemoveTags(blog.Content));
+            }
+            return blogs;
         }
 
         /// <summary>
@@ -71,6 +120,13 @@ namespace BlogService.Domain
             return ResponseJsonResult<Blog>.Succeeded;
         }
 
+        /// <summary>
+        /// 获得所有的个人博客
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<IEnumerable<Blog>> FindAllPersonalBlogsAsync(string? userId,string? token=null)
         {
             if(userId == null && token == null)
@@ -94,7 +150,7 @@ namespace BlogService.Domain
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        private Guid GetCurrentUserId(string token)
+        public Guid GetCurrentUserId(string token)
         {
             var payloadClaims = TokenCommen.GetPayloadInfo(token);
             List<Claim> claims = new List<Claim>();
@@ -115,6 +171,38 @@ namespace BlogService.Domain
                 throw new Exception("无法取到用户id");
             }
             return Guid.Parse(userId);
+        }
+
+        /// <summary>
+        /// 获取用户的基本信息
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns>返回包含用户id、用户昵称、用户头像地址的元组</returns>
+        public (string userId, string userName, string? avatarUri) GetUserInfo(string token)
+        {
+            string userId = "", userName = "", avatarUri = null;
+            var payloadClaims = TokenCommen.GetPayloadInfo(token);
+            List<Claim> claims = new List<Claim>();
+            if (payloadClaims != null && payloadClaims.Any())
+            {
+                claims = payloadClaims.ToList();
+            }
+            foreach (var claim in claims)
+            {
+                if (claim != null && claim.Type == ClaimTypes.NameIdentifier)
+                {
+                    userId = claim.Value;
+                }
+                else if (claim != null && claim.Type == ClaimTypes.Name)
+                {
+                    userName = claim.Value;
+                }
+                else if (claim != null && claim.Type == ClaimTypes.Uri)
+                {
+                    avatarUri = claim.Value;
+                }
+            }
+            return (userId, userName, avatarUri);
         }
 
         private ResponseJsonResult<Blog> ErrorResult(string? msg=null)

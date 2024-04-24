@@ -16,6 +16,7 @@ namespace BlogService.Infrastructure
             services.AddScoped<IBlogRepository, BlogRepository>();
             services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<BlogDomainService>();
+            services.AddScoped<CommentDomainService>();
         }
     }
 }

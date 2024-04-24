@@ -35,7 +35,7 @@ namespace ApiJsonResult
             {
                 ObjectResult? result = context.Result as ObjectResult;
                 //如果result本来就是ResponseJsonResult则不进行处理
-                if (result.DeclaredType == typeof(ResponseJsonResult<>))
+                if (result!.DeclaredType == typeof(ResponseJsonResult<>))
                 {
                     return;
                 }

@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+option csharp_namespace = "BlogService.WebApi.Protos";
+
+package user;
+
+// 用户相关服务
+service UserApi {
+  //获取单个用户信息
+  rpc GetSingleUserInfo (UserId) returns (UserInfo);
+  //批量获取用户信息
+  rpc GetBulkUserInfo (BulkUserId) returns (BulkUserInfo);
+}
+
+//提供id查询用户请求类
+message UserId{
+	string id = 1;
+}
+
+//用户信息响应类
+message UserInfo{
+    string id = 1;
+    optional string avatarUrl = 2;
+    string userName =3;
+}
+
+//批量查询用户信息请求类
+message BulkUserId{
+    repeated  string ids = 1;
+}
+
+//批量返回用户信息响应类
+message BulkUserInfo{
+    repeated UserInfo userInfos = 1;
+}

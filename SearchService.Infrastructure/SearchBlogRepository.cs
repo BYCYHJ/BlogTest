@@ -65,10 +65,10 @@ namespace SearchService.Infrastructure
             //对于内容，只返回前100个字
             blogs.AddRange(result.Hits.Select(s => {
                 var plainContent = s.Source.Content.Length > 100 ? s.Source.Content.Substring(0, 99) : s.Source.Content;
-                return new BlogRecord(s.Source.guid, s.Source.Title, plainContent);
+                return new BlogRecord(s.Source.guid, s.Source.Title, plainContent,UserId:s.Source.UserId,PreviewPhoto:s.Source.PreviewPhoto);
                 }
             ).ToList());
-            var response = new SearchBlogResponse(blogs,result.Total);
+            var response = new SearchBlogResponse(blogs);
             return response;
         }
 

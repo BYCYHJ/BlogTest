@@ -30,7 +30,7 @@ namespace ChatService.WebApi.Hubs
                 //绑定userid-connectionId映射表
                 _connectionMapping.Add(userId, Context.ConnectionId);
                 //将用户添加进组，省去内存映射，且防止connectionId变化问题
-                //此时一个userId就是一个单独的组，组中为所有的connectionId
+                //此时一个userId就是一个单独的组，组中为所有的connectionId,可以进行多设备聊天同步
                 await Groups.AddToGroupAsync(Context.ConnectionId, userId);
                 //查看是否含有未读消息
                 if(_memoryCache.TryGetValue(userId, out List<string>? senders))
@@ -62,11 +62,6 @@ namespace ChatService.WebApi.Hubs
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, userId);
         }
-
-        //public Task BindUser(string userId)
-        //{
-
-        //}
 
         /// <summary>
         /// 单聊发送消息
@@ -116,6 +111,22 @@ namespace ChatService.WebApi.Hubs
             var firstMsg = messages.FirstOrDefault();
             string tableName = _chatDomainService.CreateTableName(firstMsg!.SenderId,firstMsg.RecipientId);
             await _chatDomainService.SetMsgHaveRead(messages, tableName);
+        }
+
+        /// <summary>
+        /// 推送通知
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="notification"></param>
+        /// <returns></returns>
+        public async Task NotifyOne(string userId,Notification notification)
+        {
+            //查询是否在线
+            int count =_connectionMapping.GetConnections(userId).Count();
+            //如果不在线就不进行推送
+            if (count <= 0) return;
+            //推送通知
+            await Clients.Group(userId).SendAsync("ReceiveMsg",JsonConvert.SerializeObject(notification));
         }
     }
 }

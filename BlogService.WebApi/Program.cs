@@ -3,6 +3,8 @@ using BlogDomainCommons;
 using BlogJWT;
 using BlogRabbitHelper;
 using BlogService.Infrastructure;
+using BlogService.WebApi.Protos;
+using Grpc.Net.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -28,6 +30,19 @@ builder.Services.AddDbContext<BlogServiceDbContext>(opt =>
 //RabbitMQ
 builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMqOptions"));
 builder.Services.AddRabbitMqHelper(exchangerType:"fanout",queueName:"BlogService",Assembly.GetExecutingAssembly());
+
+//显式的指定HTTP/2不需要TLS支持
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", true);
+//GRPC
+builder.Services.AddGrpcClient<FileAPi.FileAPiClient>(options =>
+{
+    options.Address = new Uri(builder.Configuration.GetSection("FileServer").Value!);
+});
+builder.Services.AddGrpcClient<UserApi.UserApiClient>(options =>
+{
+    options.Address = new Uri(builder.Configuration.GetSection("UserServer").Value!);
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -58,15 +73,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
-//cors
-//builder.Services.AddCors(opt =>
-//{
-//    opt.AddDefaultPolicy(builder =>
-//    {
-//        string[] method = { "GET","POST","PATCH","PUT","DELETE" };
-//        builder.WithOrigins("*").AllowCredentials().AllowAnyHeader().WithMethods(method);
-//    });
-//});
+builder.Services.AddHttpClient();
 
 if (builder.Environment.IsDevelopment())
 {

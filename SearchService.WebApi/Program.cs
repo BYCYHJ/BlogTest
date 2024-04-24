@@ -50,21 +50,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
+builder.Services.AddHttpClient();
+
 builder.Services.Configure<MvcOptions>(opt =>
 {
     opt.Filters.Add<ResponseWrapperFilter>();//统一格式过滤器
     opt.Filters.Add<ResultExceptionFilter>();//异常处理过滤器
 });
-
-//cors
-//builder.Services.AddCors(opt =>
-//{
-//    opt.AddDefaultPolicy(builder =>
-//    {
-//        string[] method = { "GET", "POST", "PATCH", "PUT", "DELETE" };
-//        builder.WithOrigins("*").AllowCredentials().AllowAnyHeader().WithMethods(method);
-//    });
-//});
 
 if (builder.Environment.IsDevelopment())
 {

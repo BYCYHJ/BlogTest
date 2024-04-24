@@ -1,7 +1,11 @@
 ﻿using ChatService.Domain;
+using ChatService.Domain.Dtos;
 using ChatService.Domain.Entities;
+using ChatService.WebApi.Hubs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using SqlHelper;
 
 namespace ChatService.WebApi.Controllers
@@ -11,22 +15,25 @@ namespace ChatService.WebApi.Controllers
     public class TestController : ControllerBase
     {
         private readonly ChatDomainService _domainService;
+        private readonly IHubContext<MessageHub> _hubContext;
+        private readonly ConnectionMapping<string> _connectionMapping;
 
-        public TestController(ChatDomainService domainService)
+        public TestController(ChatDomainService domainService,IHubContext<MessageHub> hubContext, ConnectionMapping<string> connectionMapping)
         {
             _domainService = domainService;
+            _hubContext = hubContext;
+            _connectionMapping = connectionMapping;
         }
 
-        [HttpGet]
-        public async Task RedisToSqlTest()
+        [HttpPost]
+        public async Task RedisToSqlTest(string userId,Notification notification)
         {
-            Message msgTest = new Message(sendMsg:"test") { 
-                Type=MessageType.Text,
-                SenderId="aaa",
-                RecipientId="bbb"
-            };
-            string key = "test";
-            await _domainService.InsertToRedis(key, msgTest);
+            //查询是否在线
+            int count = _connectionMapping.GetConnections(userId).Count();
+            //如果不在线就不进行推送
+            if (count <= 0) return;
+            //推送通知
+            await _hubContext.Clients.Groups(userId).SendAsync("ReceiveNotification", JsonConvert.SerializeObject(notification));
         }
 
         [HttpGet]

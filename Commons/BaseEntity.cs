@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using MassTransit;
+using MediatR;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlogDomainCommons
@@ -13,7 +14,7 @@ namespace BlogDomainCommons
 
 
         public BaseEntity() {
-            this.Id = Guid.NewGuid();
+            this.Id = NewId.NextGuid();//使用有序Guid，方便索引
             this.CreateOnTime = DateTime.Now;
         }
 

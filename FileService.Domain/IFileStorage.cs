@@ -17,6 +17,6 @@ namespace FileService.Domain
         /// <returns></returns>
         //string UploadFileAsync(string route,string base64Content);
         //string UploadFileAsync(string route, IFormFile file);
-        Task<string> UploadPhoto(string filePath,Stream content);
+        Task<(string previewUrl, string higherUrl)> UploadPhoto(string filePath,Stream content);
     }
 }

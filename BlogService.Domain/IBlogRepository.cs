@@ -13,8 +13,15 @@ namespace BlogService.Domain
         Task<Blog?> FindOneByIdWithCommentsAsync(string id);
         Task<Blog?> FindOneByIdNoCommentsAsync(string id);
         Task<IEnumerable<Blog>> GetPersonalAllBlogsAsync(string userId);
+        Task<IEnumerable<Blog>> GetRecommendBlogsAsync(int index, int pageSize);
         Task CreateBlogAsync(Blog blog);
         Task<ResponseJsonResult<Blog>> UpdateBlogAsync(Blog blog);
         Task<ResponseJsonResult<Blog>> DeleteBlogAsync(string id);
+        /// <summary>
+        /// 判断某个博客是否存在
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<bool> BlogExistAsync(Guid id);
     }
 }

@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option csharp_namespace = "FileService.WebApi.Protos";
+
+package photo;
+
+//文件服务
+service FileApi {
+	//批量上传图片
+  rpc BulkUploadPhoto(FileBase64BulkRequest)returns (FileBulkResponse) ;
+  rpc UploadPhoto(FileBase64Request) returns (FileResponse);
+}
+
+//单个文件上传请求类
+message FileBase64Request{
+	string fileUrl = 1;
+	string fileName = 2;
+	string base64Str= 3;
+	optional string userId = 4;
+	optional string blogId = 5;
+}
+
+//向文件微服务上传多个文件请求类
+message FileBase64BulkRequest{
+	string route =1;
+	repeated string imgStrs =2; 
+	optional string user_id = 3;
+	optional string blog_id = 4;
+}
+//返回结果，包含预览图片地址和原图片地址
+message FileResponse{
+	string previewUrl=1;
+	string fileUrl=2;
+}
+
+//批量上传图片的返回结果，图片的地址集合
+message FileBulkResponse{
+	repeated FileResponse fileUrls=1;
+}

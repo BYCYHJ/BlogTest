@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option csharp_namespace = "IdentityService.WebApi.Protos";
+
+package photo;
+
+// The greeting service definition.
+service FileApi {
+  //上传头像
+  rpc UploadPhoto(FileBase64Request) returns (FileResponse);
+}
+
+//头像上传请求类
+message FileBase64Request{
+	string fileUrl = 1;
+	string fileName = 2;
+	string base64Str= 3;
+	optional string userId = 4;
+}
+
+//返回结果，包含预览图片地址和原图片地址
+message FileResponse{
+	string previewUrl=1;
+	string fileUrl=2;
+}

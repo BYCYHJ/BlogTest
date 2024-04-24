@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using MassTransit;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace Identity.Domain.Entities
     public class Role : IdentityRole<Guid>
     {
         public Role() {
-            this.Id = Guid.NewGuid();
+            this.Id = NewId.NextGuid();
         }
     }
 }

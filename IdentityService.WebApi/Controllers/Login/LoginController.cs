@@ -113,7 +113,7 @@ namespace IdentityService.WebApi.Controllers.Login
         [HttpPost]
         public async Task<ActionResult> CreateWorld()
         {
-            string username = "BaiBai";
+            string username = "BaiBai65";
             string password = "15550239";
             var result = await idRepository.CreateUserAsync(username, password);
             if (!result.Succeeded)

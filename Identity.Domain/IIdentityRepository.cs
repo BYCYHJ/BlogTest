@@ -12,6 +12,7 @@ namespace Identity.Domain
     {
         Task<User?> FindOneUserByIdAsync(string id);//根据id查找一个用户
         Task<User?> FindOneUserByNameAsync(string name);//根据用户名查找一个用户
+        IEnumerable<(string id, string name, string? avatarUrl)> FindBulkUsers(IEnumerable<string> userIds);//查找多个用户信息
         Task<IEnumerable<User?>> FindUsersByName(string name);//查找所有该用户名的用户
         Task<User?> FindOneByPhoneAsync(string phone);//根据手机号查找用户
         Task<List<string>> GetUserRoleAsync(User user);//获取角色

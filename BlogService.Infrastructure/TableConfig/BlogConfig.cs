@@ -31,6 +31,8 @@ namespace BlogService.Infrastructure.TableConfig
                     t => t.Sum(x => x.GetHashCode())
                     )
                 );
+            //创建索引
+            builder.HasIndex(b => new { b.UserId });
         }
     }
 }

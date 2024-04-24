@@ -104,5 +104,25 @@ namespace BlogService.Infrastructure
             Guid userGuid = Guid.Parse(userId);
             return await _dbContext.Blogs.Where(b => b.UserId == userGuid).ToListAsync();
         }
+
+        /// <summary>
+        /// 根据点赞数排序获得博客
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<Blog>> GetRecommendBlogsAsync(int index, int pageSize)
+        {
+            return await _dbContext.Blogs
+                .OrderBy(b => b.StartCount)
+                .Skip((index - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<bool> BlogExistAsync(Guid id)
+        {
+            return await _dbContext.Blogs.AnyAsync(b => b.Id == id);
+        }
     }
 }

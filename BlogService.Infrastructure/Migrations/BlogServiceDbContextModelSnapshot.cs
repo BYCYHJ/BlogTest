@@ -32,6 +32,9 @@ namespace BlogService.Infrastructure.Migrations
                     b.Property<DateTime>("CreateOnTime")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("PreviewPhoto")
+                        .HasColumnType("longtext");
+
                     b.Property<int>("StartCount")
                         .HasColumnType("int");
 
@@ -50,6 +53,8 @@ namespace BlogService.Infrastructure.Migrations
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("blog_blogs", (string)null);
                 });
@@ -71,6 +76,9 @@ namespace BlogService.Infrastructure.Migrations
                     b.Property<DateTime>("CreateOnTime")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("HighestCommentId")
+                        .HasColumnType("varchar(255)");
+
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("char(36)");
 
@@ -89,6 +97,8 @@ namespace BlogService.Infrastructure.Migrations
 
                     b.HasIndex("ParentId");
 
+                    b.HasIndex("UserId", "BlogId", "ParentId", "HighestCommentId");
+
                     b.ToTable("blog_comment", (string)null);
                 });
 
@@ -102,7 +112,8 @@ namespace BlogService.Infrastructure.Migrations
 
                     b.HasOne("BlogService.Domain.Entities.Comment", "ParentComment")
                         .WithMany("ChildrenComments")
-                        .HasForeignKey("ParentId");
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Blog");
 

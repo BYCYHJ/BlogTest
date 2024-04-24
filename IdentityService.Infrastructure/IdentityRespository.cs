@@ -141,6 +141,27 @@ namespace IdentityService.Infrastructure
             return await _userManager.Users.Where(u => u.UserName == name).ToListAsync();
         }
 
+        /// <summary>
+        /// 批量返回用户
+        /// </summary>
+        /// <param name="userIds"></param>
+        /// <returns></returns>
+        public IEnumerable<(string id, string name, string? avatarUrl)> FindBulkUsers(IEnumerable<string> userIds)
+        {
+            var userInfos = _userManager.Users
+                .Where(u => userIds.Contains(u.Id.ToString()))
+                .Select(info => new
+                {
+                    Id = info.Id.ToString(),
+                    Name = info.UserName!,
+                    AvatarUrl = info.AvatarUrl
+                })
+                .AsEnumerable()
+                .Select(c => (c.Id, c.Name, c.AvatarUrl))
+                .ToList();
+            return userInfos;
+        }
+
         //返回密码重置令牌
         public async Task<string> GenerateResetPwdTokenAsync(User user)
         {
@@ -194,7 +215,7 @@ namespace IdentityService.Infrastructure
         /// <exception cref="NotImplementedException"></exception>
         public async Task<IdentityResult> UpdateUserAsync(User user)
         {
-           return await  _userManager.UpdateAsync(user);
+           return await _userManager.UpdateAsync(user);
         }
     }
 }
