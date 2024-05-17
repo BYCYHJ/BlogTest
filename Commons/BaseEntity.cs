@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlogDomainCommons
 {
-    public class BaseEntity
+    public class BaseEntity : IDomainEvents
     {
         public Guid Id { get; init; } //主键Id
         public DateTime CreateOnTime { get; init; } //创建时间

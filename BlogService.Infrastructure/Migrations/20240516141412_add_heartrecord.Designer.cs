@@ -3,6 +3,7 @@ using System;
 using BlogService.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlogService.Infrastructure.Migrations
 {
     [DbContext(typeof(BlogServiceDbContext))]
-    partial class BlogServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240516141412_add_heartrecord")]
+    partial class add_heartrecord
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -84,11 +87,6 @@ namespace BlogService.Infrastructure.Migrations
 
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("timestamp(6)");
 
                     b.Property<int>("StarCount")
                         .HasColumnType("int");

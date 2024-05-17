@@ -12,11 +12,13 @@ namespace BlogService.Domain
     {
         private readonly IBlogRepository blogRepository;
         private readonly ICommentRepository commentRepository;
+        private readonly IHeartRecordRepository heartRecordRepository;
 
-        public CommentDomainService(IBlogRepository blogRepository, ICommentRepository commentRepository)
+        public CommentDomainService(IBlogRepository blogRepository, ICommentRepository commentRepository, IHeartRecordRepository heartRecordRepository)
         {
             this.blogRepository = blogRepository;
             this.commentRepository = commentRepository;
+            this.heartRecordRepository = heartRecordRepository;
         }
 
         /// <summary>
@@ -25,7 +27,7 @@ namespace BlogService.Domain
         /// <param name="comment"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public async Task CreateCommentAsync(Comment comment)
+        public async Task<Comment> CreateCommentAsync(Comment comment)
         {
             bool parentExist = true;
             bool highestExist = true;
@@ -46,7 +48,7 @@ namespace BlogService.Domain
             {
                 throw new Exception("所属评论不存在，无法作为子评论创建");
             }
-            await commentRepository.CreateCommentAsync(comment);
+            return await commentRepository.CreateCommentAsync(comment);
         }
         
         /// <summary>
@@ -80,6 +82,27 @@ namespace BlogService.Domain
         public async Task<ResponseJsonResult<Comment>> DeleteCommentAsync(string commentId)
         {
             return await commentRepository.DeleteCommentAsync(commentId);
+        }
+
+        /// <summary>
+        /// 根据id返回评论，附带真实点赞数和收藏数
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <returns></returns>
+        public async Task<(Comment, int heartCount)> GetCommentByIdAsync(string commentId)
+        {
+            return await commentRepository.GetCommentByIdAsync(commentId);
+        }
+
+        /// <summary>
+        /// 创建一条 用户-评论-喜欢 记录
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="commentId"></param>
+        /// <returns></returns>
+        public async Task<HeartRecord> CreateLoveCommentRecordAsync(string userId, string commentId)
+        {
+            return await heartRecordRepository.GetHeartRecord(userId, commentId, HeartType.Comment);
         }
     }
 }

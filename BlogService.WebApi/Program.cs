@@ -3,6 +3,7 @@ using BlogDomainCommons;
 using BlogJWT;
 using BlogRabbitHelper;
 using BlogService.Infrastructure;
+using BlogService.WebApi.Notification;
 using BlogService.WebApi.Protos;
 using Grpc.Net.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -34,7 +35,7 @@ builder.Services.AddRabbitMqHelper(exchangerType:"fanout",queueName:"BlogService
 //显式的指定HTTP/2不需要TLS支持
 AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", true);
-//GRPC
+//GRPC 客户端
 builder.Services.AddGrpcClient<FileAPi.FileAPiClient>(options =>
 {
     options.Address = new Uri(builder.Configuration.GetSection("FileServer").Value!);
@@ -55,6 +56,10 @@ builder.Services.Configure<MvcOptions>(options =>
     options.Filters.Add<ResponseWrapperFilter>();//添加统一格式过滤器
     options.Filters.Add<ResultExceptionFilter>();//异常格式处理过滤器
 });
+
+//MediatR
+builder.Services.AddScoped(typeof(NotificationHandler));
+builder.Services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 //JWT
 builder.Services.Configure<JWTOptions>(builder.Configuration.GetSection("JWT"));

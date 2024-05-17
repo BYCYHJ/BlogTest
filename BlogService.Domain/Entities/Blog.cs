@@ -8,7 +8,8 @@ namespace BlogService.Domain.Entities
         public string Content { get; private set; }//文章内容
         public List<TagClass> Tags { get; set; } = new List<TagClass>();//文章标签
         public Guid UserId { get; init; }//作者
-        public int StartCount { get; private set; } = 0;//点赞数
+        public int HeartCount { get; private set; } = 0;//点赞数
+        public int StartCount { get; private set; } = 0;//收藏数
         public string? PreviewPhoto { get; private set; }//博客预览图
         public List<Comment> Comments { get; set; } = new List<Comment>();//评论
 
@@ -58,22 +59,50 @@ namespace BlogService.Domain.Entities
             this.Content = content;
         }
 
-        //增加点赞数
+        /// <summary>
+        /// 增加点赞数
+        /// </summary>
+        public void AddHeart()
+        {
+            this.HeartCount++;
+        }
+
+        /// <summary>
+        /// 取消点赞
+        /// </summary>
+        public void RemoveHeart()
+        {
+            if (this.HeartCount > 0)
+            {
+                this.HeartCount--;
+            }
+            HeartCount = 0;
+        }
+
+        /// <summary>
+        /// 增加收藏数
+        /// </summary>
         public void AddStar()
         {
             StartCount++;
         }
 
+        /// <summary>
+        /// 取消收藏
+        /// </summary>
         public void RemoveStars()
         {
-            if(this.Tags.Count > 0)
+            if(this.StartCount > 0)
             {
                 StartCount--;
             }
             StartCount = 0;
         }
 
-        //修改预览图
+        /// <summary>
+        /// 修改预览图
+        /// </summary>
+        /// <param name="url"></param>
         public void UpdatePreviewPhoto(string url)
         {
             PreviewPhoto = url;

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,13 @@ namespace BlogService.Infrastructure
 {
     public class BlogServiceDbContextDesignFac : IDesignTimeDbContextFactory<BlogServiceDbContext>
     {
+        //private readonly IMediator _mediator;
+
+        //public BlogServiceDbContextDesignFac(IMediator mediator)
+        //{
+        //    _mediator = mediator;
+        //}
+
         public BlogServiceDbContext CreateDbContext(string[] args)
         {
             string conStr = "Server=132.232.108.176;Port=3306;Database=blog_d1;Uid=root;Pwd=15550239";

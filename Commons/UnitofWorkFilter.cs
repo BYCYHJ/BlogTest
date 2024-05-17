@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 
 namespace BlogDomainCommons
 {
+    /// <summary>
+    /// 保持一致性，如果执行失败不进行结果更新
+    /// </summary>
     public class UnitofWorkFilter : IAsyncActionFilter
     {
 
@@ -37,7 +40,21 @@ namespace BlogDomainCommons
                 var dbCtx = context.HttpContext.RequestServices.GetService(type) as DbContext;
                 if (dbCtx != null)
                 {
-                    dbCtx.SaveChanges();
+                    try
+                    {
+                        await dbCtx.SaveChangesAsync();
+                    }
+                    //捕获并发更新冲突
+                    catch(DbUpdateConcurrencyException ex)
+                    {
+                        //检查受到影响的实体
+                        foreach(var entry in ex.Entries)
+                        {
+                            //重新加载尝试重新更新
+                            entry.Reload();
+                        }
+                        await dbCtx.SaveChangesAsync();//保存结果,进行更新
+                    }
                 }
             }
         }

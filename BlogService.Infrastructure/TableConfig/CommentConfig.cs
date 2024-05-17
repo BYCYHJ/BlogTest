@@ -24,6 +24,7 @@ namespace BlogService.Infrastructure.TableConfig
                 .HasForeignKey(c => c.ParentId)
                 .OnDelete(DeleteBehavior.Cascade);//自引用一对多，启用级联删除
             builder.HasIndex(c => new { c.UserId, c.BlogId, c.ParentId,c.HighestCommentId});
+            builder.Property(c => c.RowVersion).IsRowVersion();
         }
     }
 }

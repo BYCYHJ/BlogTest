@@ -1,4 +1,6 @@
-﻿namespace BlogService.WebApi.Controllers
+﻿using BlogService.Domain.Entities;
+
+namespace BlogService.WebApi.Controllers
 {
     public record CommentRequest(string content, 
         string blogId, 
@@ -16,6 +18,12 @@
         string userName,
         string? avatarUrl=null, 
         int starCount=0,
-        string? replyUserName=null
+        string? replyUserName=null,
+        string? highestCommentId= null
+        );
+
+    public record CommentWithCount(
+        Comment comment,
+        int count
         );
 }

@@ -2,6 +2,7 @@
 using BlogService.Domain;
 using BlogService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
@@ -26,9 +27,10 @@ namespace BlogService.Infrastructure
             return await _dbContext.Comments.AnyAsync(c => c.Id ==  guid);
         }
 
-        public async Task CreateCommentAsync(Comment comment)
+        public async Task<Comment> CreateCommentAsync(Comment comment)
         {
             await _dbContext.Comments.AddAsync(comment);
+            return comment;
         }
 
         /// <summary>
@@ -122,6 +124,30 @@ namespace BlogService.Infrastructure
                 .Include(commnet => commnet.ParentComment)
                 .ToListAsync();
             return comments;
+        }
+
+        /// <summary>
+        /// 根据id寻找博客记录，并带回点赞和收藏数量
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public async Task<(Comment, int heartCount)> GetCommentByIdAsync(string commentId)
+        {
+            var result = await _dbContext.Comments
+                .Where(c => c.Id.ToString() == commentId)
+                .GroupJoin(
+                _dbContext.Hearts,
+                comment => comment.Id.ToString(),
+                heart => heart.ObjectId,
+                (comment, heart) => new
+                {
+                    Comment = comment,
+                    ActualCount = heart.Count()
+                }
+                ).FirstAsync();
+            if (result == null) { throw new Exception($"没有找到id为{commentId}的博客记录"); }
+            return (result.Comment, result.ActualCount);
         }
 
         //快捷错误result

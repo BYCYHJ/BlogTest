@@ -17,6 +17,7 @@ namespace BlogService.Infrastructure
             services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<BlogDomainService>();
             services.AddScoped<CommentDomainService>();
+            services.AddScoped<IHeartRecordRepository, HeartRecordRepository>();
         }
     }
 }

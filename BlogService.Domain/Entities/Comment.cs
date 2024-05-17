@@ -1,5 +1,6 @@
 ﻿using BlogDomainCommons;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -25,6 +26,8 @@ namespace BlogService.Domain.Entities
         [InverseProperty(nameof(Comment.ChildrenComments))]
         public virtual Comment? ParentComment { get; private set; }//所属的评论(引用属性)
         public Guid? ParentId { get; private set; }//所属的评论id
+        [Timestamp]
+        public byte[] RowVersion { get; set; }//乐观锁
 
 
 
@@ -57,6 +60,11 @@ namespace BlogService.Domain.Entities
                 this.StarCount--;
             }
             this.StarCount = 0;
+        }
+
+        public void SetStarCount(int starCount)
+        {
+            this.StarCount = starCount;
         }
 
     }

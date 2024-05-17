@@ -5,10 +5,13 @@ using BlogService.Domain;
 using BlogService.Domain.Dtos;
 using BlogService.Domain.Entities;
 using BlogService.Infrastructure;
+using BlogService.WebApi.Notification;
+using BlogService.WebApi.Protos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
@@ -21,18 +24,19 @@ namespace BlogService.WebApi.Controllers
     public class CommentsController : ControllerBase
     {
         private readonly CommentDomainService _commentDomainService;
-        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
-        public CommentsController(CommentDomainService commentDomainService, IHttpClientFactory httpClientFactory,IConfiguration configuration)
+        private readonly UserApi.UserApiClient _userApiClient;
+
+        public CommentsController(CommentDomainService commentDomainService,IConfiguration configuration,UserApi.UserApiClient userClient)
         {
             _commentDomainService = commentDomainService;
-            _httpClientFactory = httpClientFactory;
             _configuration = configuration;
+            _userApiClient = userClient;
         }
 
         [HttpPost]
         [UnitofWork(new Type[] { typeof(BlogServiceDbContext) })]
-        public async Task CreateComment([FromBody]CommentRequest commentReq)
+        public async Task<CommentResponse> CreateComment([FromBody]CommentRequest commentReq)
         {
             string? userId = null;
             if( String.IsNullOrEmpty(commentReq.userId))
@@ -44,7 +48,11 @@ namespace BlogService.WebApi.Controllers
                 userId = commentReq.userId;
             }
             Comment comment = new Comment(content:commentReq.content,blogId:commentReq.blogId,userId:userId,parentId:commentReq.parentId,highestId:commentReq.highestCommentId);
-            await _commentDomainService.CreateCommentAsync(comment);
+            Comment result = await _commentDomainService.CreateCommentAsync(comment);
+            List<Comment> temp  = new List<Comment>();
+            temp.Add(comment);
+            List<CommentResponse> list =  await AddUserInfoToComments(temp);
+            return list.ElementAt(0);
         }
 
         [HttpDelete]
@@ -68,6 +76,24 @@ namespace BlogService.WebApi.Controllers
         {
             var comments =  await _commentDomainService.GetChildrenCommentsAsync(parentId:commentId, size: pageSize, page: index);
             return await AddUserInfoToComments(comments);
+        }
+
+        /// <summary>
+        /// 增加点赞
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [UnitofWork(new Type[] { typeof(BlogServiceDbContext) })]
+        public async Task<int> AddHeart(string commentId)
+        {
+            (Comment,int HeartCount) comment = await _commentDomainService.GetCommentByIdAsync(commentId);
+            //将已有的记录数量值赋值给Comment
+            comment.Item1.SetStarCount(comment.HeartCount);
+            comment.Item1.AddStar();
+            //发布领域事件
+            comment.Item1.AddDomainEvents(new LoveNotification(GetCurrentUserId(),commentId,HeartType.Comment));
+            return comment.Item1.StarCount;
         }
 
         //获取当前用户id
@@ -110,25 +136,34 @@ namespace BlogService.WebApi.Controllers
         /// <param name="userIds"></param>
         /// <returns>包含了用户信息的集合</returns>
         [NoWrap]
-        private async Task<List<UserInfo>> GetBulkUserInfos(IEnumerable<string> userIds)
+        private async Task<List<Domain.Dtos.UserInfo>> GetBulkUserInfos(IEnumerable<string> userIds)
         {
             if (!userIds.Any()) { throw new Exception("无用户信息"); }
             string? userServer = _configuration.GetSection("UserServer").Value;
             //配置文件无服务器信息直接返回
             if (userServer == null) { throw new Exception("无用户服务器信息"); }
             //发送请求
-            var client =  _httpClientFactory.CreateClient();
-            client.BaseAddress = new Uri(userServer);
-            string token = GetToken();//token
-            client.DefaultRequestHeaders.Add(HeaderNames.Authorization, "Bearer " + token);
-            var response = await client.PostAsJsonAsync("/api/User/GetBulkUserInfo", userIds);
-            //如果非成功状态，抛出异常
-            if (!response.IsSuccessStatusCode)
+            _userApiClient.WithHost(userServer);
+            var ids = new BulkUserId();
+            ids.Ids.AddRange(userIds);
+            BulkUserInfo userInfos = await _userApiClient.GetBulkUserInfoAsync(ids);
+            List<Domain.Dtos.UserInfo> result =  userInfos.UserInfos.Select(info =>
             {
-                throw new Exception("查询用户请求未成功");
-            }
-            string content = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<IEnumerable<UserInfo>>(content).ToList();
+                return new Domain.Dtos.UserInfo(info.Id, info.UserName, info.AvatarUrl);
+            }).ToList();
+            return result;
+            //var client =  _httpClientFactory.CreateClient();
+            //client.BaseAddress = new Uri(userServer);
+            //string token = GetToken();//token
+            //client.DefaultRequestHeaders.Add(HeaderNames.Authorization, "Bearer " + token);
+            //var response = await client.PostAsJsonAsync("/api/User/GetBulkUserInfo", userIds);
+            ////如果非成功状态，抛出异常
+            //if (!response.IsSuccessStatusCode)
+            //{
+            //    throw new Exception("查询用户请求未成功");
+            //}
+            //string content = await response.Content.ReadAsStringAsync();
+            //return JsonConvert.DeserializeObject<IEnumerable<UserInfo>>(content).ToList();
         }
 
         [NoWrap]
@@ -149,10 +184,10 @@ namespace BlogService.WebApi.Controllers
                     }
                 }
             }
-            List<UserInfo> userInfos = await GetBulkUserInfos(userIds);
+            List<Domain.Dtos.UserInfo> userInfos = await GetBulkUserInfos(userIds);
             List<CommentResponse> result = comments.Select(comment =>
             {
-                UserInfo user = userInfos.Where(info => info.id == comment.UserId.ToString()).First();
+                Domain.Dtos.UserInfo user = userInfos.Where(info => info.id == comment.UserId.ToString()).First();
                 string? replyName = null;
                 if (comment.ParentComment is not null)
                 {
@@ -167,7 +202,8 @@ namespace BlogService.WebApi.Controllers
                     userName: user.userName,
                     avatarUrl: user.avatarUrl,
                     starCount:comment.StarCount,
-                    replyUserName:replyName
+                    replyUserName:replyName,
+                    highestCommentId:comment.HighestCommentId
                     );
                 return response;
             }).ToList();

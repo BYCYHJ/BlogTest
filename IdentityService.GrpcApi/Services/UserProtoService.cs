@@ -23,8 +23,8 @@ namespace IdentityService.GrpcApi.Services
                     {
                         Id = info.id,
                         UserName = info.name,
-                        AvatarUrl = info.avatarUrl,
-                    });
+                        AvatarUrl = info.avatarUrl == null ? "" : info.avatarUrl,
+                    }).ToList();
                 BulkUserInfo result = new BulkUserInfo();
                 result.UserInfos.AddRange(userInfos);
                 return Task.FromResult(result);
